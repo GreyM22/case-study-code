@@ -1,0 +1,98 @@
+._container {
+  margin-left : 20px;
+  margin-right: 20px;
+}
+
+.card {
+  max-width   : 561px;
+  margin-top  : 72px;
+  margin-bottom: 72px;
+  border-color: #0A2A59;
+}
+
+.card-success {
+  border-color: #608830!important;
+}
+
+.text-edit {
+  color: #0A2A59;
+}
+
+.card-edit {
+  border-color: hsl(52, 94%, 52%);
+}
+
+.form-group {
+  text-align: left !important;
+}
+
+.submit {
+  color           : white;
+  background-color: #305EA1;
+}
+
+.submit-success {
+  background-color: #608830!important;
+}
+
+.submit-edit {
+  background-color: hsl(52, 94%, 52%)!important;
+}
+
+
+.submit:hover,
+.submit:focus {
+  background-color: hsl(216, 54%, 31%);
+}
+
+.submit-success:hover,
+.submit-success:focus {
+  background-color: hsl(87, 48%, 26%)!important  ;
+}
+
+.submit-edit:hover,
+.submit-edit:focus {
+  background-color: hsl(52, 94%, 47%)!important  ;
+}
+
+
+.card-header,
+.card-footer,
+.form-control {
+  border-color: #0A2A59;
+}
+
+.card-header-success,
+.card-footer-success,
+.form-control-success {
+  border-color: #608830;
+}
+
+.card-header-edit,
+.card-footer-edit,
+.form-control-edit {
+  border-color: hsl(52, 94%, 52%);
+}
+
+.card-footer-success{
+  color: #608830;
+}
+
+.card-footer-edit{
+  color: hsl(52, 94%, 52%);
+}
+
+.form-control:focus, .submit:focus {
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px #305EA1;
+  box-shadow        : inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px #305EA1;
+}
+
+.form-control-success:focus, .submit-success:focus {
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px #608830;
+  box-shadow        : inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px #608830;
+}
+
+.form-control-edit:focus, .submit-edit:focus {
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px hsl(52, 94%, 52%);
+  box-shadow        : inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px hsl(52, 94%, 52%);
+}

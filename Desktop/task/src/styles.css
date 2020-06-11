@@ -1,0 +1,18 @@
+/* You can add global styles to this file, and also import other style files */
+::-moz-selection { /* Code for Firefox */
+  color: white!important;
+  background: #7952b3!important;
+}
+
+::selection {
+  color: white!important;
+  background: #7952b3!important;
+}
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.material-icons {
+  display: inline-flex;
+  vertical-align: middle;
+}

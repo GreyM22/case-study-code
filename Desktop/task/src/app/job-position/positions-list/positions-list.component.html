@@ -1,0 +1,8 @@
+<div class="card" style="width: 18rem;">
+  <div class="card-body">
+    <h6 class="card-title">{{position.name}}</h6>
+    <p class="card-text">{{position.description | slice:0:210}}...</p>
+    <a *ngIf="authService.isAuthorized(position.departmentId) || authService.isSuperAdmin()"  class="btn " [routerLink]="['/edit-position',position.id]">Edit</a>
+    <button *ngIf="authService.isAuthorized(position.departmentId) || authService.isSuperAdmin()"  class="btn w-30 " (click)="delete(position.id)">Delete</button>
+  </div>
+</div>

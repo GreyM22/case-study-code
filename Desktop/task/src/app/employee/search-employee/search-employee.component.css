@@ -1,0 +1,45 @@
+.search-list {
+  max-width: 500px;
+  margin: auto;
+}
+
+.avatar{
+  display: block;
+  width: 64px;
+  height: 64px;
+  background-position: center top!important ;
+  background-size: cover!important;
+  background-repeat: no-repeat!important;
+  background-color: #cccccc!important;
+}
+
+.name-jobPosition{
+  height: 64px;
+  line-height: 64px;
+}
+.list-group-item {
+  border-color: #7952b3;
+}
+.no-border {
+  border-top: none;
+  border-bottom: none;
+  border-radius: 0!important;
+}
+
+a {
+  color: #000000;
+}
+
+a:hover, a:active {
+  color:#7952b3;
+  text-decoration: none;
+}
+
+ul.pagination {
+  max-width: 248px!important;
+}
+
+.page-link {
+  cursor: pointer;
+}
+

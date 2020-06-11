@@ -1,0 +1,27 @@
+<div class="row">
+  <div class="card" *ngFor="let department of departments">
+    <div class="card-body">
+      <h5 class="card-title">{{department.name}}</h5>
+      <p class="card-text">{{department.description}}</p>
+      <a  class="btn view" [routerLink]="['/view-department',department.id]">View</a>
+      <a *ngIf="authService.isAuthorized(department.id) || authService.isSuperAdmin()" class="btn " [routerLink]="['/edit-department',department.id]">Edit</a>
+      <button *ngIf="authService.isSuperAdmin()" class="btn w-30 " (click)="delete(department.id)">Delete</button>
+    </div>
+  </div>
+  <div class="alert alert-danger" role="alert" *ngIf="departments.length === 0">
+    {{messageFromServer}}
+  </div>
+</div>
+
+
+<nav aria-label="Departments navigation" >
+  <ul class="pagination mx-auto ">
+    <li class="page-item" (click)="nextPage(-1, true)"><span class="page-link" >Previous</span></li>
+    <li
+    class="page-item" *ngFor="let number of (totalNumberOfDepartments / pageSize) | numberToArray"
+    (click)="nextPage(number + 1, false)">
+      <span  class="page-link" >{{number + 1}}</span>
+    </li>
+    <li class="page-item" (click)="nextPage(+1, true)"><span class="page-link">Next</span></li>
+  </ul>
+</nav>

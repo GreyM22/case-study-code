@@ -1,0 +1,45 @@
+<ul class="list-group w-100 px-3 pt-3">
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-4 text-center">Profile Photo</div>
+      <div class="col-4 text-center">Full Name</div>
+      <div class="col-4 text-center">Job Position</div>
+    </div>
+  </li>
+  <li class="list-group-item" *ngFor="let employee of searchResult; let i = index" [ngClass]="{
+    'no-border': i!== (searchResult.length - 1)
+  }">
+    <div class="row">
+      <div class="col-4 text-center ">
+        <a [routerLink]="['/view-employee', employee.id]" title="Click to view employee!">
+          <div [ngStyle]="{background: 'url('+ employee.photo + ')'}" class="mr-3 avatar mx-auto"></div>
+        </a>
+      </div>
+      <div class="col-4 text-center name-jobPosition ">
+        <a [routerLink]="['/view-employee', employee.id]" title="Click to view employee!">
+          {{employee.name}} {{employee.surname}}
+        </a>
+      </div>
+      <div class="col-4 text-center name-jobPosition ">{{employee.positionName}}</div>
+    </div>
+  </li>
+  <li class="list-group-item" *ngIf="searchResult.length === 0">
+    <div class="text-center">
+      No employee was found! Please search again
+    </div>
+  </li>
+
+</ul>
+
+<nav class="mt-2" *ngIf="searchResult" aria-label="Departments navigation" >
+  <ul  class="pagination mx-auto ">
+    <li class="page-item" (click)="nextPage(-1, true)"><span class="page-link" >Previous</span></li>
+    <li
+    class="page-item" *ngFor="let number of (totalNumberOfEmployees / pageSize) | numberToArray"
+    (click)="nextPage(number + 1, false)">
+      <span  class="page-link" >{{number + 1}}</span>
+    </li>
+    <li class="page-item" (click)="nextPage(+1, true)"><span class="page-link">Next</span></li>
+  </ul>
+</nav>
+

@@ -1,0 +1,36 @@
+.card {
+  margin: 10px;
+  background-color: 	hsl(356, 62%, 96%);
+  border-color: hsl(356, 62%, 29%);
+}
+
+.card-text {
+  height: 166px;
+}
+
+.btn {
+  background-color: hsl(51, 100%, 86%);
+  color           : #0A2A59;
+  margin          : 5px;
+  width           : 45%;
+  border-color    : hsl(51, 100%, 50%);
+}
+
+.btn:focus {
+  background-color  : white;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px hsl(51, 100%, 50%);
+  box-shadow        : inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px hsl(51, 100%, 50%);
+}
+
+button.btn {
+  background-color: red;
+  color           : white;
+}
+
+button.btn:focus {
+  background-color  : white;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px red;
+  box-shadow        : inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px red;
+  color             : red;
+  border-color      : red;
+}
