@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { AuthService } from '../auth.service';
 import { DepartmentService } from 'src/app/department/department.service';
@@ -6,6 +6,9 @@ import { ActivatedRoute, Router, ParamMap } from '@angular/router';
 import { Department } from 'src/app/department/department.model';
 import { CustomValidators } from '../../validators/custom-validators';
 import { Admin } from '../admin.model';
+import { Store } from '@ngrx/store';
+import { ErrorMessage, showError } from 'src/app/store/error';
+import { IsLoading, stopLoading, startLoading } from 'src/app/store/isLoading';
 
 @Component({
   selector: 'app-create-admin',
@@ -13,6 +16,7 @@ import { Admin } from '../admin.model';
   styleUrls: ['./create-admin.component.css']
 })
 export class CreateAdminComponent implements OnInit {
+  @ViewChild('TopCard', { static: true }) TopCard: ElementRef;
   createAdmin: FormGroup;
   messageFromServer: string;
   departmentsList: Department[];
@@ -26,12 +30,16 @@ export class CreateAdminComponent implements OnInit {
     private departmentService: DepartmentService,
     private router: ActivatedRoute,
     private _router: Router,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private errorStore: Store<ErrorMessage>,
+    private loadingStore: Store<IsLoading>
   ) {
     this.creteForm();
   }
 
   ngOnInit() {
+
+    this.loadingStore.dispatch(startLoading());
 
     this.departmentService
       .getAll(null, null)
@@ -41,7 +49,7 @@ export class CreateAdminComponent implements OnInit {
           console.log(res.message);
         },
         err => {
-          console.log(err.message);
+          this.errorStore.dispatch(showError({ payload: { message: err.error.message } } ))
         }
       );
 
@@ -54,6 +62,7 @@ export class CreateAdminComponent implements OnInit {
             .getAdmin(this.adminId)
             .subscribe(
               res => {
+                this.loadingStore.dispatch(stopLoading());
                 const admin: Admin = res.admin;
                 this.createAdmin = new FormGroup({
                   name: new FormControl(admin.name, [Validators.required, Validators.minLength(4)]),
@@ -85,9 +94,10 @@ export class CreateAdminComponent implements OnInit {
                   departmentId: new FormControl(admin.departmentId, Validators.required)
                 });
               },
-              err => console.log(err.message)
+              err => this.errorStore.dispatch(showError({ payload: { message: err.error.message } } ))
             );
         } else {
+          this.loadingStore.dispatch(stopLoading());
           this.createAdmin = new FormGroup({
             name: new FormControl(null, [Validators.required, Validators.minLength(4)]),
             surname: new FormControl(null, [Validators.required, Validators.minLength(4)]),
@@ -148,8 +158,10 @@ export class CreateAdminComponent implements OnInit {
   onSubmit() {
     if (this.createAdmin.invalid) {
       this.messageFromServer = 'Data entered is invalid';
+      this.TopCard.nativeElement.scrollIntoView({ behavior: 'smooth' });
       return;
     }
+    this.loadingStore.dispatch(startLoading());
     const adminData = this.createAdmin.value;
     if (this.editMode) {
       this.authService.updateAdmin(

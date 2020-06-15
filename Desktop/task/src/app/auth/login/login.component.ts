@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { AuthService } from '../auth.service';
 import { Router } from '@angular/router';
+import { IsLoading, startLoading } from 'src/app/store/isLoading';
+import { Store } from '@ngrx/store';
 
 @Component({
   selector: 'app-login',
@@ -17,7 +19,8 @@ export class LoginComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private loadingStore: Store<IsLoading>
   ) { }
 
   get email() { return this.loginForm.get('email'); }
@@ -34,11 +37,13 @@ export class LoginComponent implements OnInit {
     const email = this.loginForm.value.email;
     const password = this.loginForm.value.password;
     const url = this.router.url;
-    if (url === '/login/super-admin') {
+    this.loadingStore.dispatch(startLoading());
+    if (url === '/auth/login/super-admin') {
       this.authService.loginSuperAdmin(email, password);
     } else {
       this.authService.login(email, password);
     }
+
   }
 
 }

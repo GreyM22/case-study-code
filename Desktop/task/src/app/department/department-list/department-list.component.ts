@@ -1,10 +1,14 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { Store } from '@ngrx/store';
+import { Subscription } from 'rxjs';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 
+import { ConfirmationModalComponent } from '../../modal/confirmation-modal/confirmation-modal.component';
 import { DepartmentService } from '../department.service';
 import { Department } from '../department.model';
-import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { AuthService } from 'src/app/auth/auth.service';
-import { Subscription } from 'rxjs';
+import { IsLoading, startLoading, stopLoading } from 'src/app/store/isLoading';
 
 @Component({
   selector: 'app-department-list',
@@ -25,11 +29,14 @@ export class DepartmentListComponent implements OnInit, OnDestroy {
     private departmentService: DepartmentService,
     private router: ActivatedRoute,
     private _router: Router,
-    public authService: AuthService
+    public authService: AuthService,
+    private loadingStore: Store<IsLoading>,
+    private confirmationModalService: NgbModal
   ) {
   }
 
   ngOnInit() {
+    this.loadingStore.dispatch(startLoading());
     this.router.paramMap
       .subscribe((paramMap: ParamMap) => {
         if (paramMap.has('pageNumber')) {
@@ -40,11 +47,15 @@ export class DepartmentListComponent implements OnInit, OnDestroy {
           .getAll(this.pageNumber, this.pageSize)
           .subscribe(
             res => {
+              this.loadingStore.dispatch(stopLoading());
               console.log(res.message);
               this.departments = res.departments;
               this.totalNumberOfDepartments = res.totalNumber;
             },
-            err => this.messageFromServer = err.message
+            err => {
+              this.loadingStore.dispatch(stopLoading());
+              this.messageFromServer = err.error.message;
+            }
           );
       });
   }
@@ -54,21 +65,32 @@ export class DepartmentListComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
   }
 
-  delete(id: string) {
-    // call the service to delete the selected department
-    this.departmentService
-      .deleteById(id)
-      .subscribe(
-        res => {
-          // after deleting the department in the backend
-          // remove the department for the array in the frontend
-          this.departments = this.departments.filter(
-            department => department.id !== id
-          );
-          console.log(res.message);
-        },
-        err => this.messageFromServer = err.message
-      );
+  delete(id: string, departmentName: string) {
+    const modalRef = this.confirmationModalService.open(ConfirmationModalComponent);
+    modalRef.componentInstance.name = 'delete ' + departmentName + ' Department';
+    modalRef
+    .componentInstance
+    .passEntry
+    .subscribe(
+      confirmationForDeletion => {
+        if (confirmationForDeletion) {
+          // call the service to delete the selected department
+          this.departmentService
+            .deleteById(id)
+            .subscribe(
+              res => {
+                // after deleting the department in the backend
+                // remove the department for the array in the frontend
+                this.departments = this.departments.filter(
+                  department => department.id !== id
+                );
+                console.log(res.message);
+              },
+              err => this.messageFromServer = err.message
+            );
+        }
+      }
+    )
   }
 
   nextPage(page: number, previousOrNext: boolean) {

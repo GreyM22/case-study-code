@@ -108,3 +108,23 @@ a mat-icon, button {
   color: red;
 }
 
+app-positions-list {
+  width: 320px;
+}
+
+@media screen and (max-width: 991px) {
+
+  h5 {
+    text-align: center;
+
+  }
+  .description {
+    margin-top: 48px;
+  }
+}
+
+@media screen and (max-width: 412px) {
+  app-positions-list {
+    width: 100%;
+  }
+}

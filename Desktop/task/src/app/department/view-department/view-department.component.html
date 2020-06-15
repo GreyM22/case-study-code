@@ -1,4 +1,4 @@
-<div class="card">
+<div class="card" *ngIf="!errorFromServerForDepartment">
   <div class="card-body">
     <div class="row">
       <div class="col-lg-3">
@@ -9,16 +9,17 @@
             <li class="admin-element" *ngFor="let admin of departmentAdmins">
               {{admin.name}} {{admin.surname}}
               <a
+              placement="top" ngbTooltip="Click to edit the Admin of the department!"
               *ngIf="authService.isSuperAdmin()"
-              [routerLink]="['/edit-admin', admin.id]"
+              [routerLink]="['/auth/edit-admin', admin.id]"
               class="edit "
               title="Edit Employee!">
               <mat-icon >edit</mat-icon>
             </a>
             <a
             *ngIf="authService.isSuperAdmin()"
-
-            (click)="deleteAdmin(admin.id)"
+            placement="right" ngbTooltip="Click to delete the Admin of the department!"
+            (click)="deleteAdmin(admin.id, admin.name, admin.surname)"
             class="delete "
             title="Fire Employee!" >
             <mat-icon >delete</mat-icon>
@@ -27,9 +28,9 @@
             </li>
           </ul>
         </div>
-        <div class="subtitle mb-3">Employees:</div>
+        <div class="subtitle mb-3 ">Employees:</div>
         <app-employees-list *ngFor="let employee of departmentEmployees" [employee]="employee"></app-employees-list>
-        <nav aria-label="Departments navigation" >
+        <nav aria-label="Departments navigation" *ngIf="totalNumberOfJobEmployees > pageEmployeesSize" >
           <ul class="pagination ml-0 mr-auto">
             <li class="page-item" (click)="nextPageEmployees(-1, true)"><span class="page-link" >Previous</span></li>
             <li
@@ -41,8 +42,8 @@
           </ul>
         </nav>
       </div>
-      <div class="col-auto">
-        <h6>Description</h6>
+      <div class="col-lg-auto col-12 text-lg-left text-center ">
+        <h6 class="description" >Description</h6>
         <p class="card-text department-view">{{department?.description}}</p>
         <h6>Job Position</h6>
         <p class="card-text card-lists">
@@ -50,7 +51,7 @@
           *ngFor="let position of departmentJobPositions"
           [position]="position"></app-positions-list>
         </p>
-        <nav aria-label="Departments navigation" >
+        <nav aria-label="Departments navigation" *ngIf="totalNumberOfJobPositions > pagePositionSize">
           <ul class="pagination mx-auto ">
             <li class="page-item" (click)="nextPage(-1, true)"><span class="page-link" >Previous</span></li>
             <li
@@ -65,5 +66,10 @@
     </div>
   </div>
 </div>
+
+<div class="alert alert-danger m-5 text-center" role="alert" *ngIf="errorFromServerForDepartment">
+  {{errorFromServerForDepartment}}
+</div>
+
 
 

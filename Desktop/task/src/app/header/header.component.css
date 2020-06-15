@@ -15,3 +15,10 @@
   outline: #ffe484;
   box-shadow: 0px 1px 10px #ffe484;
 }
+
+
+@media only screen and (max-width: 1025px) {
+  .navbar-nav .nav-item {
+    text-align: center;
+  }
+}

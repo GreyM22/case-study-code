@@ -5,10 +5,12 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { Subject, Observable, BehaviorSubject } from 'rxjs';
 import { Admin } from './admin.model';
+import { errorFeatureKey, ErrorMessage, showError } from '../store/error';
 import { Role } from './role';
 
 import { logUser, logoutUser, User, authFeatureKey } from '../store/auth';
 import { Store } from '@ngrx/store';
+import { IsLoading, stopLoading, startLoading } from '../store/isLoading';
 
 const BACKEND_URL = environment.apiUrl + '/auth';
 const localStorageTokenName = 'token';
@@ -29,7 +31,9 @@ export class AuthService {
   constructor(
     private http: HttpClient,
     private router: Router,
-    private store: Store<User>
+    private storeAuth: Store<User>,
+    private storeErrorMessage: Store<{ [errorFeatureKey]: ErrorMessage }>,
+    private storeLoading: Store<IsLoading>
   ) {
     // get the data from the localStorage
     const token = localStorage.getItem(localStorageTokenName);
@@ -51,7 +55,7 @@ export class AuthService {
     } else {
       employeesId = null;
     }
-    store.dispatch(logUser({payload: {token, role, departmentId, positionsId, employeesId}}));
+    storeAuth.dispatch(logUser({ payload: { token, role, departmentId, positionsId, employeesId } }));
   }
 
   setPositionsId(array: number[]) {
@@ -104,6 +108,7 @@ export class AuthService {
       (BACKEND_URL, { email: emailUser, password: passwordUser })
       .subscribe(
         res => {
+          this.storeLoading.dispatch(startLoading());
           this.setToken(
             res.token,
             res.expiresIn,
@@ -113,7 +118,9 @@ export class AuthService {
             res.employeesId
           );
         },
-        err => console.log(err.message)
+        err => {
+          this.storeErrorMessage.dispatch(showError({ payload: { message: err.message } }));
+        }
       );
   }
 
@@ -130,6 +137,7 @@ export class AuthService {
       (BACKEND_URL + '/super-admin', { email: emailUser, password: passwordUser })
       .subscribe(
         res => {
+          this.storeLoading.dispatch(stopLoading())
           this.setToken(
             res.token,
             res.expiresIn,
@@ -139,7 +147,7 @@ export class AuthService {
             res.employeesId
           );
         },
-        err => console.log(err)
+        err => this.storeErrorMessage.dispatch(showError({ payload: { message: err.message } }))
       );
   }
 
@@ -165,7 +173,7 @@ export class AuthService {
     } else {
       localStorage.setItem(localStorageEmployeesIdName, null);
     }
-    this.store.dispatch(logUser({payload: {token, role, departmentId, positionsId, employeesId}}));
+    this.storeAuth.dispatch(logUser({ payload: { token, role, departmentId, positionsId, employeesId } }));
 
     const expireDuration = expiresIn;
     this.tokenTimer = setTimeout(() => {
@@ -181,7 +189,7 @@ export class AuthService {
     localStorage.removeItem(localStoragePositionsIdName);
     localStorage.removeItem(localStorageEmployeesIdName);
 
-    this.store.dispatch(logoutUser());
+    this.storeAuth.dispatch(logoutUser());
 
     clearTimeout(this.tokenTimer);
   }
@@ -206,20 +214,21 @@ export class AuthService {
       (BACKEND_URL + '/create-user', admin)
       .subscribe(
         res => {
-
+          this.storeLoading.dispatch(stopLoading());
+          this.router.navigate(['/']);
         },
-        err => console.log(err.message)
+        err => this.storeErrorMessage.dispatch(showError({ payload: { message: err.message } }))
       );
   }
 
   getAdmins(departmentId: number): Observable<any> {
-    return this.http.get<{message: string; admins?: Admin[]}>
-    (BACKEND_URL + '/users/' + departmentId);
+    return this.http.get<{ message: string; admins?: Admin[] }>
+      (BACKEND_URL + '/users/' + departmentId);
   }
 
   getAdmin(adminId: number): Observable<any> {
-    return this.http.get<{message: string; admin?: Admin}>
-    (BACKEND_URL + '/user/' + adminId);
+    return this.http.get<{ message: string; admin?: Admin }>
+      (BACKEND_URL + '/user/' + adminId);
   }
 
   updateAdmin(
@@ -229,21 +238,22 @@ export class AuthService {
     email: string,
     password: string,
     departmentId: number
-    ) {
-      const admin: Admin = {id, name, surname, email, password, departmentId};
-      this.http
-          .post<{message: string;}>(BACKEND_URL + '/edit-user', admin)
-          .subscribe(
-            res => {
-              console.log(res.message);
-              this.router.navigate(['/']);
-            },
-            err => console.log(err.message)
-          );
+  ) {
+    const admin: Admin = { id, name, surname, email, password, departmentId };
+    this.http
+      .post<{ message: string; }>(BACKEND_URL + '/edit-user', admin)
+      .subscribe(
+        res => {
+          this.storeLoading.dispatch(stopLoading());
+          console.log(res.message);
+          this.router.navigate(['/']);
+        },
+        err => this.storeErrorMessage.dispatch(showError({ payload: { message: err.message } }))
+      );
   }
 
   deleteAdmin(adminId: number): Observable<any> {
-    return this.http.delete<{message: string}>(BACKEND_URL + '/user/' + adminId);
+    return this.http.delete<{ message: string }>(BACKEND_URL + '/user/' + adminId);
   }
 
 }

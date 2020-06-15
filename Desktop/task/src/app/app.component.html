@@ -1,5 +1,13 @@
 <app-header></app-header>
 
-<main>
-  <router-outlet></router-outlet>
+
+<main [@routeAnimations]="prepareRoute(outlet)">
+  <div class="s003 position-relative">
+    <div  *ngIf="isLoading" class=" loading text-danger justify-content-center ">
+      <div  class="spinner-border text-warning m-5" role="status">
+        <span class="sr-only">Loading...</span>
+      </div>
+    </div>
+    <router-outlet #outlet="outlet"></router-outlet>
+  </div>
 </main>

@@ -2,19 +2,24 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators, FormBuilder } from '@angular/forms';
 import { DepartmentService } from '../department.service';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { Employee } from 'src/app/employee/employee.model';
+import { IsLoading, startLoading, stopLoading } from 'src/app/store/isLoading';
+import { Store } from '@ngrx/store';
 
 @Component({
   selector: 'app-create-department',
   templateUrl: './create-department.component.html',
-  styleUrls: ['./create-department.component.css']
+  styleUrls: ['./create-department.component.css'],
 })
 export class CreateDepartmentComponent implements OnInit {
 
+  // for the animation
+  flipInY: any;
   // variable for the validation of the form
   departmentForm: FormGroup;
   // message after sending request to the server
   messageFromServer: string;
+  // in case there is an error from the server
+  error: boolean;
   // check if we are editing a department not creating new one
   editMode: boolean;
   // department id in the url, in case we are editing
@@ -24,7 +29,8 @@ export class CreateDepartmentComponent implements OnInit {
     private departmentService: DepartmentService,
     private router: ActivatedRoute,
     private _router: Router,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private loadingStore: Store<IsLoading>
     ) {
     this.creteForm();
   }
@@ -37,6 +43,7 @@ export class CreateDepartmentComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.loadingStore.dispatch(startLoading());
     this.router.paramMap
       .subscribe((paramMap: ParamMap) => {
         if (paramMap.has('id')) {
@@ -46,6 +53,7 @@ export class CreateDepartmentComponent implements OnInit {
             .getById(this.departmentId)
             .subscribe(
               res => {
+                this.loadingStore.dispatch(stopLoading());
                 this.departmentForm = new FormGroup({
                   name: new FormControl(res.department.name, [
                     Validators.required,
@@ -57,9 +65,14 @@ export class CreateDepartmentComponent implements OnInit {
                   ])
                 });
               },
-              err => console.log(err)
+              err => {
+                this.loadingStore.dispatch(stopLoading());
+                this.messageFromServer = err.error.message;
+                this.error = true;
+              }
             );
         } else {
+          this.loadingStore.dispatch(stopLoading());
           this.departmentForm = new FormGroup({
             name: new FormControl('', [
               Validators.required,
@@ -81,6 +94,7 @@ export class CreateDepartmentComponent implements OnInit {
 
   onSubmit() {
     if (this.departmentForm.valid) {
+      this.loadingStore.dispatch(startLoading());
       // check if it is being edit a new department
       if (this.editMode) {
         return this.departmentService
@@ -91,12 +105,18 @@ export class CreateDepartmentComponent implements OnInit {
           )
           .subscribe(
             res => {
+              this.loadingStore.dispatch(stopLoading());
               console.log(res.message);
               this._router.navigate(['/']);
             },
-            err => this.messageFromServer = err.message
-          );
+            err => {
+              this.messageFromServer = err.error.message;
+              this.error = true;
+              this.loadingStore.dispatch(stopLoading());
+            }
+        );
       }
+
       // pass the data te the service
       this.departmentService.post(
         this.departmentForm.value.name,
@@ -105,11 +125,16 @@ export class CreateDepartmentComponent implements OnInit {
         // subscribe to check if succeeded
         .subscribe(
           res => {
+            this.loadingStore.dispatch(stopLoading());
             this.messageFromServer = res.message;
             this.departmentForm.reset();
           },
-          err => this.messageFromServer = err.message
-        );
+          err => {
+            this.loadingStore.dispatch(stopLoading());
+            this.messageFromServer = err.error.message;
+            this.error = true;
+          }
+    );
     }
   }
 }

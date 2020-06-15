@@ -3,6 +3,8 @@ import { Employee } from '../employee.model';
 import { Position } from '../../job-position/position.model';
 import { EmployeeService } from '../employee.service';
 import { AuthService } from 'src/app/auth/auth.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ConfirmationModalComponent } from 'src/app/modal/confirmation-modal/confirmation-modal.component';
 
 @Component({
   selector: 'app-employees-list',
@@ -16,7 +18,8 @@ export class EmployeesListComponent implements OnInit {
 
   constructor(
     private employeeService: EmployeeService,
-    public authService: AuthService
+    public authService: AuthService,
+    private confirmationModalService: NgbModal
   ) { }
 
   ngOnInit() {
@@ -32,8 +35,21 @@ export class EmployeesListComponent implements OnInit {
   }
 
   fireEmployee() {
-    this.employeeService
-      .fireEmployee(this.employee.id);
+    const name = this.employee.name;
+    const surname = this.employee.surname;
+    const modalRef = this.confirmationModalService.open(ConfirmationModalComponent);
+    modalRef.componentInstance.name = 'fire ' + name + ' ' + surname;
+    modalRef
+      .componentInstance
+      .passEntry
+      .subscribe(
+        confirmation => {
+          if (confirmation) {
+            this.employeeService
+              .fireEmployee(this.employee.id);
+          }
+        }
+      )
   }
 
 }

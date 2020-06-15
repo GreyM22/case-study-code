@@ -1,12 +1,13 @@
 <div class="card">
   <div class="card-body px-0 py-1">
-    <blockquote class="blockquote mb-0">
+    <blockquote class="blockquote mb-0 text-lg-left text-center">
       <p>{{employee.name}} {{employee.surname}}</p>
       <footer class="blockquote-footer"> <cite title="Source Title">{{employeeJobPosition?.name}}</cite></footer>
-        <div class="actions d-block ">
-          <a class="view " [routerLink]="['/view-employee', employee.id]" title="View Employee!"><mat-icon >remove_red_eye</mat-icon></a>
-          <a *ngIf="authService.isAuthorized(employee.departmentId) || authService.isSuperAdmin()" [routerLink]="['/edit-employee', employee.id]" class="edit " title="Edit Employee!"><mat-icon >edit</mat-icon></a>
-          <button *ngIf="authService.isAuthorized(employee.departmentId) || authService.isSuperAdmin()" type="button" (click)="fireEmployee()" class="delete btn" title="Fire Employee!" ><mat-icon >delete</mat-icon></button>
+        <div class="actions d-block d-lg-block d-flex justify-content-lg-center w-100">
+          <a placement="top" ngbTooltip="Click to view employee's information!"
+          class="view ml-auto mr-0 " [routerLink]="['/employees/view-employee', employee.id]" ><mat-icon >remove_red_eye</mat-icon></a>
+          <a placement="top" ngbTooltip="Click to edit employee's information!" *ngIf="authService.isAuthorized(employee.departmentId) || authService.isSuperAdmin()" [routerLink]="['/employees/edit-employee', employee.id]" class="edit  mx-2 "><mat-icon >edit</mat-icon></a>
+          <button placement="top" ngbTooltip="Click to fire employee!"  *ngIf="authService.isAuthorized(employee.departmentId) || authService.isSuperAdmin()" type="button" (click)="fireEmployee()" class="delete btn  ml-0 mr-auto"><mat-icon >delete</mat-icon></button>
         </div>
     </blockquote>
   </div>

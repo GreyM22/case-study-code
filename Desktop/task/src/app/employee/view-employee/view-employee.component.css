@@ -49,7 +49,7 @@ button.btn:focus {
 
 img{
   width: 132px;
-  border-radius: 20%;
+  float: left;
 }
 
 h2 {
@@ -72,4 +72,20 @@ a:hover {
 }
 .cv mat-icon {
   font-size: 48px;
+}
+
+@media only screen and (max-width: 581px) {
+  img {
+    float: none;
+    margin-left: auto!important;
+    margin-right: auto;
+    display: block;
+  }
+  .img-wrapper {
+    width: 100%;
+    align-self: center;
+  }
+  h1 {
+    align-self: center;
+  }
 }

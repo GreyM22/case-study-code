@@ -2,18 +2,20 @@ import { Component, OnInit, OnDestroy, ChangeDetectorRef, ViewChild, ElementRef 
 import { FormGroup, FormBuilder, Validators, FormControl, NgForm } from '@angular/forms';
 import { ActivatedRoute, Router, ParamMap } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { ImageCroppedEvent } from 'ngx-image-cropper';
+import { Store } from '@ngrx/store';
 
 import { DepartmentService } from 'src/app/department/department.service';
 import { PositionService } from 'src/app/job-position/position.service';
 import { EmployeeService } from '../employee.service';
+import { AuthService } from 'src/app/auth/auth.service';
 
 import { Employee } from '../employee.model';
 import { Department } from 'src/app/department/department.model';
 import { Position } from 'src/app/job-position/position.model';
-import { mimeType } from './mineType.validator';
-import { AuthService } from 'src/app/auth/auth.service';
-import { Store } from '@ngrx/store';
 import { User } from 'src/app/store/auth';
+import { IsLoading, startLoading, stopLoading } from 'src/app/store/isLoading';
+import { mimeType } from './mineType.validator';
 
 
 
@@ -39,7 +41,10 @@ export class CreateEmployeeComponent implements OnInit, OnDestroy {
   imagePreview: string;
   date: Date;
   employeeID: string;
-
+  // for cropping the image
+  imageChangedEvent: any = '';
+  croppedImage: any = '';
+  file: File;
 
   constructor(
     private departmentService: DepartmentService,
@@ -49,7 +54,8 @@ export class CreateEmployeeComponent implements OnInit, OnDestroy {
     private _router: Router,
     private formBuilder: FormBuilder,
     private authService: AuthService,
-    private store: Store<{user: User}>
+    private store: Store<{ user: User }>,
+    private loadingStore: Store<IsLoading>
   ) {
     this.creteForm();
   }
@@ -67,7 +73,7 @@ export class CreateEmployeeComponent implements OnInit, OnDestroy {
       photo: [null, Validators.required],
       cv: [null, Validators.required],
       departmentId: 0,
-      jobPosition: 0
+      positionId: 0
     });
   }
 
@@ -95,12 +101,14 @@ export class CreateEmployeeComponent implements OnInit, OnDestroy {
 
   get departmentId() { return this.employeeForm.get('departmentId'); }
 
-  get jobPosition() { return this.employeeForm.get('jobPosition'); }
+  get positionId() { return this.employeeForm.get('positionId'); }
 
 
 
 
   ngOnInit() {
+    // set the loading
+    this.loadingStore.dispatch(startLoading());
     // get all available id of the departments
     this.departmentService
       .getAll(null, null)
@@ -108,7 +116,7 @@ export class CreateEmployeeComponent implements OnInit, OnDestroy {
         res => {
           this.departments = res.departments;
 
-                    // in case a department admin is logged in
+          // in case a department admin is logged in
           // add job only for the department he belongs
 
           if (!this.authService.isSuperAdmin()) {
@@ -124,7 +132,7 @@ export class CreateEmployeeComponent implements OnInit, OnDestroy {
         },
         err => {
           this.error = true;
-          this.messageFromServer = err.message;
+          this.messageFromServer = err.error.message;
         }
       );
 
@@ -212,13 +220,18 @@ export class CreateEmployeeComponent implements OnInit, OnDestroy {
                   cv: this.employee.cv
                 });
                 this.getJobPositionsOfDepartment();
-                console.log(this.employeeForm);
+                this.loadingStore.dispatch(stopLoading());
+              },
+              err => {
+                this.loadingStore.dispatch(stopLoading());
+                this.messageFromServer = err.error.message;
               }
             );
         } else {
           this.editMode = false;
           this.employeeID = null;
-
+          this.loadingStore.dispatch(stopLoading());
+          this.error = true;
         }
       });
   }
@@ -260,10 +273,13 @@ export class CreateEmployeeComponent implements OnInit, OnDestroy {
         // update the position in the view department component
         (positions: Position[]) => {
           this.jobPositions = positions;
+          if (this.editMode) {
+            this.employeeForm.controls['positionId'].setValue(this.jobPositions[0].id);
+          }
         },
         // inform the user in case of any error
         err => {
-          this.messageFromServer = 'Error with the Job Position Service!';
+          this.messageFromServer = err.error.message;
           this.error = true;
         }
       );
@@ -278,7 +294,9 @@ export class CreateEmployeeComponent implements OnInit, OnDestroy {
       this.TopCard.nativeElement.scrollIntoView({ behavior: 'smooth' });
       return;
     }
+    console.log(this.editMode)
     const employeeData = this.employeeForm.value;
+    this.loadingStore.dispatch(startLoading());
     if (this.editMode) {
       this.employeeService.editEmployee(
         this.employee.id,
@@ -298,71 +316,115 @@ export class CreateEmployeeComponent implements OnInit, OnDestroy {
       )
         .subscribe(
           res => {
+            console.log('editEmployee was called!')
+            this.loadingStore.dispatch(stopLoading());
             console.log(res);
-            this._router.navigate(['view-department', this.employee.departmentId]);
+            this._router.navigate(['departments/view-department', this.employee.departmentId]);
             return;
           },
           err => {
-            this.messageFromServer = err.message;
+            this.loadingStore.dispatch(stopLoading());
+            this.messageFromServer = err.error.message;
             this.error = true;
             return;
           }
         );
-    }
-    this.employeeService.postEmployee(
-      employeeData.name,
-      employeeData.surname,
-      employeeData.address,
-      employeeData.email,
-      employeeData.phone,
-      employeeData.age,
-      employeeData.birthday,
-      employeeData.jobExperience,
-      employeeData.photo,
-      employeeData.cv,
-      employeeData.departmentId,
-      employeeData.positionId,
-      employeeData.personalID
-    )
-      .subscribe(
-        res => {
-          this.messageFromServer = res.message;
-          this.employeeForm.reset();
-          // reset the values of the form in the front-end
-          this.htmlForm.form.reset();
-          this.TopCard.nativeElement.scrollIntoView({ behavior: 'smooth' });
-          if (this.error) {
-            this.error = false;
+    } else {
+
+      this.employeeService.postEmployee(
+        employeeData.name,
+        employeeData.surname,
+        employeeData.address,
+        employeeData.email,
+        employeeData.phone,
+        employeeData.age,
+        employeeData.birthday,
+        employeeData.jobExperience,
+        employeeData.photo,
+        employeeData.cv,
+        employeeData.departmentId,
+        employeeData.positionId,
+        employeeData.personalID
+      )
+        .subscribe(
+          res => {
+            console.log('postEmployee was called!')
+            this.loadingStore.dispatch(stopLoading());
+            this.messageFromServer = res.message;
+            this.employeeForm.reset();
+            // reset the values of the form in the front-end
+            this.htmlForm.form.reset();
+            // remove the cropped images
+            this.croppedImage = null;
+            this.imageChangedEvent = null;
+            this.TopCard.nativeElement.scrollIntoView({ behavior: 'smooth' });
+            if (this.error) {
+              this.error = false;
+            }
+          },
+          err => {
+            this.loadingStore.dispatch(stopLoading());
+            this.messageFromServer = err.error.message;
+            this.error = true;
           }
-        },
-        err => {
-          this.messageFromServer = err.message;
-          this.error = true;
-        }
-      );
+        );
+    }
   }
 
   onPhotoUpload(event: Event) {
+    this.imageChangedEvent = event;
     // get the file from the form
-    const file: File = (event.target as HTMLInputElement).files[0];
+    this.file = (event.target as HTMLInputElement).files[0];
+
+  }
+
+  imageCropped(event: ImageCroppedEvent) {
+    this.croppedImage = event.base64;
+    const blob = this.dataURItoBlob(this.croppedImage);
+    let finalFile: File = new File([blob], this.file.name, {type: this.file.type});
     // check the type of file
-    const fileType = file.name.split('.')[1];
+    const fileType = this.file.name.split('.')[1];
     // if type image, save it in the employeeForm
     if (fileType === 'jpg' || fileType === 'png') {
       this.employeeForm.patchValue({
-        photo: file
+        photo: finalFile
       });
       this.employeeForm.get('photo').updateValueAndValidity();
 
       const fileReader: FileReader = new FileReader();
-      fileReader.readAsDataURL(file);
+      fileReader.readAsDataURL(blob);
       fileReader.onload = () => {
       }
       // if not image, throw error in the form
     } else {
       this.employeeForm.controls['photo'].setErrors({ 'incorrect': true });
     }
+
   }
+
+  dataURItoBlob(dataURI) {
+    const binary = atob(dataURI.split(',')[1]);
+    const array = [];
+    for (let i = 0; i < binary.length; i++) {
+      array.push(binary.charCodeAt(i));
+    }
+    return new Blob([new Uint8Array(array)], {
+      type: 'image/png'
+    });
+  }
+
+
+  imageLoaded() {
+    // show cropper
+  }
+  cropperReady() {
+    // cropper ready
+  }
+  loadImageFailed() {
+    // show message
+  }
+
+
 
   onFileUpload(event: Event) {
     // get the file from the form

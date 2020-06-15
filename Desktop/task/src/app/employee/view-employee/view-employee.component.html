@@ -1,13 +1,18 @@
-<div class="card">
-  <a class="cv" target="_blank" [href]="employee?.cv" title="Click to see CV!"><mat-icon >description</mat-icon></a>
-  <div class="card-body">
+<div class="card" *ngIf="!messageFromServer">
+  <a class="cv d-md-none d-sm-block" target="_blank" [href]="employee?.cv" title="Click to see CV!"><mat-icon >description</mat-icon></a>
+  <div class="row m-0 w-100">
+    <div class="img-wrapper">
+      <img class="ml-5 mt-3" [src]="employee?.photo" alt="Employee Profile Picture">
+    </div>
+    <h1 class="card-title mx-auto text-center mt-4">{{employee?.name}} {{employee?.surname}}</h1>
+    <a class="cv d-md-block d-none" target="_blank" [href]="employee?.cv" title="Click to see CV!"><mat-icon >description</mat-icon></a>
+  </div>
+  <div class="card-body ">
     <div class="row">
-      <div class="col-lg-3">
-        <h1 class="card-title">{{employee?.name}} {{employee?.surname}}</h1>
-        <img [src]="employee?.photo" alt="Employee Profile Picture">
+      <div class="col-lg-3 ml-4 text-lg-left text-lg-left text-center">
         <h2>{{currentJobPosition[0]?.name}}</h2>
         <h4 *ngIf="department">in
-          <a [routerLink]="['/view-department', department.id]" title="Click to view department!">{{department?.name}}</a>
+          <a [routerLink]="['/departments/view-department', department.id]" title="Click to view department!">{{department?.name}}</a>
 
         </h4>
         <h6>Personal info:</h6>
@@ -20,7 +25,7 @@
           ID: {{employee?.personalID}}
         </p>
       </div>
-      <div class="col-auto">
+      <div class="col-lg-auto text-lg-left text-center">
         <h6>Previews Job Experience</h6>
         <p class="card-text department-view">{{employee?.jobExperience}}</p>
         <h6>Job history in the company:</h6>
@@ -44,4 +49,8 @@
       </div>
     </div>
   </div>
+</div>
+
+<div class="alert alert-danger text-center m-5" role="alert" *ngIf="messageFromServer">
+  {{messageFromServer}}
 </div>

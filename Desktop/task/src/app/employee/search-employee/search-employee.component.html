@@ -31,7 +31,7 @@
 
 </ul>
 
-<nav class="mt-2" *ngIf="searchResult" aria-label="Departments navigation" >
+<nav class="mt-2" *ngIf="totalNumberOfEmployees > pageSize" aria-label="Departments navigation" >
   <ul  class="pagination mx-auto ">
     <li class="page-item" (click)="nextPage(-1, true)"><span class="page-link" >Previous</span></li>
     <li

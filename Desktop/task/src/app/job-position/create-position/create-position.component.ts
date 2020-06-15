@@ -8,6 +8,7 @@ import { Department } from 'src/app/department/department.model';
 import { AuthService } from 'src/app/auth/auth.service';
 import { User } from 'src/app/store/auth';
 import { Store } from '@ngrx/store';
+import { IsLoading, startLoading, stopLoading } from 'src/app/store/isLoading';
 
 @Component({
   selector: 'app-create-position',
@@ -36,7 +37,8 @@ export class CreatePositionComponent implements OnInit {
     private _router: Router,
     private formBuilder: FormBuilder,
     private authService: AuthService,
-    private store: Store<{user: User}>
+    private store: Store<{ user: User }>,
+    private loadingStore: Store<IsLoading>
   ) {
     this.creteForm();
   }
@@ -55,6 +57,8 @@ export class CreatePositionComponent implements OnInit {
 
 
   ngOnInit() {
+    // set loading
+    this.loadingStore.dispatch(startLoading());
     // check if we are editing not creating a job position
     this.router.paramMap
       .subscribe((paramMap: ParamMap) => {
@@ -66,6 +70,7 @@ export class CreatePositionComponent implements OnInit {
             .getById(this.positionId)
             .subscribe(
               res => {
+                this.loadingStore.dispatch(stopLoading());
                 const position = res.position;
                 // initialize the form
                 // with the position data to be edited
@@ -82,9 +87,15 @@ export class CreatePositionComponent implements OnInit {
                     Validators.required
                   ])
                 });
+              },
+              err => {
+                this.loadingStore.dispatch(stopLoading());
+                this.messageFromServer =  err.error.message;
+                this.error = true;
               }
             );
         } else {
+          this.loadingStore.dispatch(stopLoading());
           // initialize the form
           this.positionForm = new FormGroup({
             name: new FormControl('', [
@@ -118,13 +129,16 @@ export class CreatePositionComponent implements OnInit {
                 const adminDepartment = storeRes.user.departmentId;
                 this.departments = this.departments.filter(department => +department.id === adminDepartment);
               },
-              err => console.log(err)
+              err => {
+                this.messageFromServer = err.error.message;
+                this.error = true;
+              }
             );
           }
         },
         err => {
           this.error = true;
-          this.messageFromServer = err.message;
+          this.messageFromServer = err.error.message;
         }
       );
 
@@ -134,6 +148,8 @@ export class CreatePositionComponent implements OnInit {
     if (!this.positionForm.valid) {
       return;
     }
+
+    this.loadingStore.dispatch(startLoading());
     if (this.editMode) {
       // send request to the server to update
       // the value of the position form
@@ -146,13 +162,20 @@ export class CreatePositionComponent implements OnInit {
         )
         .subscribe(
           res => {
+            this.loadingStore.dispatch(stopLoading());
             // display server in the console log
             console.log(res.message);
             // navigate back to the department view
             this._router.navigate([
-              '/view-department',
+              '/departments/view-department',
               this.positionForm.value.departmentId
             ]);
+          },
+          err => {
+            this.loadingStore.dispatch(stopLoading());
+            this.error = true;
+            this.messageFromServer = err.error.message;
+            return;
           }
         );
     }
@@ -166,12 +189,15 @@ export class CreatePositionComponent implements OnInit {
       .postPosition(name, description, departmentId)
       .subscribe(
         res => {
+          this.loadingStore.dispatch(stopLoading());
+          this.error = false;
           this.messageFromServer = res.message;
           this.positionForm.reset();
         },
         err => {
+          this.loadingStore.dispatch(stopLoading());
           this.error = true;
-          this.messageFromServer = err.message;
+          this.messageFromServer = err.error.message;
         }
       );
   }

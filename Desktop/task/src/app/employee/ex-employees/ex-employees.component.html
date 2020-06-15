@@ -1,4 +1,3 @@
-<div class="s003">
   <form (ngSubmit)="onSubmit()" [formGroup]="searchExEmployeeFrom">
     <div class="inner-form">
       <div class="input-field second-wrap">
@@ -35,30 +34,30 @@
     }">
       <div class="row">
         <div class="col-3 text-center ">
-          <a [routerLink]="['/view-employee', employee.id]" title="Click to view employee!">
+          <a [routerLink]="['/employees/view-employee', employee.id]" title="Click to view employee!">
             <div [ngStyle]="{background: 'url('+ employee.photo + ')'}" class="mr-3 avatar mx-auto"></div>
           </a>
         </div>
         <div class="col-3 text-center name-jobPosition ">
-          <a [routerLink]="['/view-employee', employee.id]" title="Click to view employee!">
+          <a [routerLink]="['/employees/view-employee', employee.id]" title="Click to view employee!">
             {{employee.name}} {{employee.surname}}
           </a>
         </div>
         <div class="col-3 text-center name-jobPosition ">{{employee.positionName}}</div>
         <div class="col-3 text-center name-jobPosition ">
-          <a [routerLink]="['/view-employee', employee.departmentId]" title="Click to view Department!">
+          <a [routerLink]="['/employees/view-employee', employee.departmentId]" title="Click to view Department!">
             {{employee.departmentName}}
           </a>
         </div>
       </div>
     </li>
-    <li *ngIf="!exEmployeeList" class="list-group-item">
+    <li *ngIf="exEmployeeList?.length === 0 || !exEmployeeList" class="list-group-item">
       <div class="text-center">
         No employee was found! Please search again
       </div>
     </li>
   </ul>
-  <nav class="mt-2" *ngIf="exEmployeeList" aria-label="Departments navigation" >
+  <nav class="mt-2" *ngIf="totalNumberOfEmployees > pageSize" aria-label="Departments navigation" >
     <ul  class="pagination mx-auto ">
       <li class="page-item" (click)="nextPage(-1, true)"><span class="page-link" >Previous</span></li>
       <li
@@ -70,4 +69,3 @@
     </ul>
   </nav>
 
-</div>

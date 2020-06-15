@@ -10,6 +10,11 @@ import { AuthService } from 'src/app/auth/auth.service';
 import { Department } from '../department.model';
 import { Employee } from 'src/app/employee/employee.model';
 import { Admin } from 'src/app/auth/admin.model';
+import { Store } from '@ngrx/store';
+import { ErrorMessage, showError } from 'src/app/store/error';
+import { IsLoading, startLoading, stopLoading } from 'src/app/store/isLoading';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ConfirmationModalComponent } from 'src/app/modal/confirmation-modal/confirmation-modal.component';
 
 @Component({
   selector: 'app-view-department',
@@ -18,12 +23,12 @@ import { Admin } from 'src/app/auth/admin.model';
 })
 export class ViewDepartmentComponent implements OnInit, OnDestroy {
   departmentId: string;
-  departmentJobPositions: Position[];
-  departmentEmployees: Employee[];
-  departmentAdmins: Admin[];
+  departmentJobPositions: Position[] = [];
+  departmentEmployees: Employee[] = [];
+  departmentAdmins: Admin[] = [];
   updatedPositions: Subscription;
   updatedEmployees: Subscription;
-  errorFromServer: string;
+  errorFromServerForDepartment: string;
   department: Department;
   // name of the department administrator
   adminName: string;
@@ -43,10 +48,15 @@ export class ViewDepartmentComponent implements OnInit, OnDestroy {
     private _router: Router,
     private departmentService: DepartmentService,
     private employeeService: EmployeeService,
-    public authService: AuthService
+    public authService: AuthService,
+    private store: Store<ErrorMessage>,
+    private loadingStore: Store<IsLoading>,
+    private confirmationModalService: NgbModal
   ) { }
 
   ngOnInit() {
+    // set the loading spinner
+    this.loadingStore.dispatch(startLoading());
     // listen to the url of the site
     this.router.paramMap
       .subscribe(
@@ -61,7 +71,7 @@ export class ViewDepartmentComponent implements OnInit, OnDestroy {
                 this.department = res.department;
                 console.log(res.message);
               },
-              err => this.errorFromServer = err.message
+              err => this.errorFromServerForDepartment = err.error.message
             );
           // get all the job position of the department
           // using the department id
@@ -77,7 +87,7 @@ export class ViewDepartmentComponent implements OnInit, OnDestroy {
                 this.totalNumberOfJobPositions = this.positionService.getNumberOfPosition();
               },
               // inform the user in case of any error
-              err => this.errorFromServer = 'Error with the Job Position Service!'
+              err => this.store.dispatch(showError({ payload: { message: err.error.message }}))
             );
           // get all the employees of the department
           // using the department id
@@ -101,7 +111,7 @@ export class ViewDepartmentComponent implements OnInit, OnDestroy {
                 }
               },
               // inform the user in case of any error
-              err => this.errorFromServer = 'Error with the Employees Service!'
+              err => this.store.dispatch(showError({ payload: { message: err.error.message }}))
             );
           this.authService
               .getAdmins(+this.departmentId)
@@ -110,11 +120,12 @@ export class ViewDepartmentComponent implements OnInit, OnDestroy {
                   this.departmentAdmins = res.admins;
                   console.log(res.message);
                 },
-                err => console.log(err.message)
+                err => this.store.dispatch(showError({ payload: { message: err.error.message }}))
               );
+          this.loadingStore.dispatch(stopLoading());
         },
         // in case of error with angular
-        err => this.errorFromServer = err
+        err => this.store.dispatch(showError({ payload: { message: err }}))
       );
   }
 
@@ -165,16 +176,26 @@ export class ViewDepartmentComponent implements OnInit, OnDestroy {
       .getEmployees(this.departmentId, this.pageEmployeesNumber, this.pageEmployeesSize);
   }
 
-  deleteAdmin(adminId: number) {
-    this.authService
-        .deleteAdmin(adminId)
-        .subscribe(
-          res => {
-            this.departmentAdmins = this.departmentAdmins.filter(admin => admin.id !== adminId);
-            console.log(res.message);
-          },
-          err => console.log(err.message)
-        );
+  deleteAdmin(adminId: number, adminName: string, adminSurname: string) {
+    const modalRef = this.confirmationModalService.open(ConfirmationModalComponent);
+    modalRef.componentInstance.name = 'delete Admin ' + adminName + ' ' + adminSurname;
+    modalRef
+      .componentInstance
+      .passEntry
+      .subscribe(
+        confirmation => {
+          this.authService
+              .deleteAdmin(adminId)
+              .subscribe(
+                res => {
+                  this.departmentAdmins = this.departmentAdmins.filter(admin => admin.id !== adminId);
+                  console.log(res.message);
+                },
+                err => console.log(err.message)
+              );
+        }
+      )
+
 
   }
 

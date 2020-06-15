@@ -7,6 +7,9 @@ import { ActivatedRoute, Router, ParamMap } from '@angular/router';
 import { DepartmentService } from 'src/app/department/department.service';
 import { PositionService } from 'src/app/job-position/position.service';
 import { JobHistory } from '../job-history.model';
+import { IsLoading, startLoading, stopLoading } from 'src/app/store/isLoading';
+import { Store } from '@ngrx/store';
+import { ErrorMessage, showError } from 'src/app/store/error';
 
 @Component({
   selector: 'app-view-employee',
@@ -25,10 +28,14 @@ export class ViewEmployeeComponent implements OnInit {
     private departmentService: DepartmentService,
     private positionService: PositionService,
     private router: ActivatedRoute,
-    private _router: Router
+    private _router: Router,
+    private loadingStore: Store<IsLoading>,
+    private errorStore: Store<ErrorMessage>
   ) { }
 
   ngOnInit() {
+    // set loading
+    this.loadingStore.dispatch(startLoading());
     // get the id of the employee from the router
     this.router.paramMap
       .subscribe((paramMap: ParamMap) => {
@@ -59,6 +66,7 @@ export class ViewEmployeeComponent implements OnInit {
                       .getEmployeeJobHistory(this.employee.id)
                       .subscribe(
                         res => {
+                          this.loadingStore.dispatch(stopLoading());
                           this.jobHistory = res.jobHistory
                           // convert the value createdAt
                           // into a date
@@ -78,14 +86,14 @@ export class ViewEmployeeComponent implements OnInit {
                             }
                           );
                         },
-                        err => console.log(err.message)
+                        err => this.errorStore.dispatch(showError({ payload: { message: err.error.message } }))
                       );
 
                   },
-                  err => this.messageFromServer = err.message
+                  err => this.errorStore.dispatch(showError({ payload: { message: err.error.message } }))
                 )
             },
-            err => this.messageFromServer = err.message
+            err => this.errorStore.dispatch(showError({ payload: { message: err.error.message } }))
           )
       })
   }

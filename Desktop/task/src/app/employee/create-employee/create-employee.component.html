@@ -20,10 +20,11 @@
 
     <div class="card-body">
       <h5 class="card-title">Insert the information for the employee!</h5>
-      <form  [formGroup]="employeeForm" #htmlForm="ngForm">
+      <form [formGroup]="employeeForm" #htmlForm="ngForm">
         <div class="form-group">
           <label for="employeeName">Name</label>
-          <input specialIsAlphaNumeric type="text" class="form-control" id="employeeName" formControlName="name" [ngClass]="{
+          <input specialIsAlphaNumericWithSpace type="text" class="form-control" id="employeeName" formControlName="name"
+            [ngClass]="{
               'form-control-success': name.valid && name.dirty,
               'form-control-edit': editMode
             }" value="{{this.employeeForm.value.name}}">
@@ -38,7 +39,8 @@
         </div>
         <div class="form-group">
           <label for="employeeSurname">Surname</label>
-          <input specialIsAlphaNumeric type="text" class="form-control" id="employeeSurname" formControlName="surname" [ngClass]="{
+          <input specialIsAlphaNumericWithSpace type="text" class="form-control" id="employeeSurname" formControlName="surname"
+            [ngClass]="{
               'form-control-success': surname.valid && surname.dirty,
               'form-control-edit': editMode
             }" value="{{this.employeeForm.value.surname}}">
@@ -53,7 +55,8 @@
         </div>
         <div class="form-group">
           <label for="employeeAddress">Address</label>
-          <input specialIsAlphaNumericWithSpace type="text" class="form-control" id="employeeAddress" formControlName="address" [ngClass]="{
+          <input specialIsAlphaNumericWithSpace type="text" class="form-control" id="employeeAddress"
+            formControlName="address" [ngClass]="{
               'form-control-success': address.valid && address.dirty,
               'form-control-edit': editMode
             }" value="{{this.employeeForm.value.address}}">
@@ -68,7 +71,8 @@
         </div>
         <div class="form-group">
           <label for="employeePersonalID">Personal ID</label>
-          <input specialIsAlphaNumeric type="text" class="form-control" id="employeePersonalID" formControlName="personalID" [ngClass]="{
+          <input specialIsAlphaNumeric type="text" class="form-control" id="employeePersonalID"
+            formControlName="personalID" [ngClass]="{
               'form-control-success': personalID.valid && personalID.dirty,
               'form-control-edit': editMode
             }" value="{{this.employeeForm.value.personalID}}">
@@ -95,17 +99,10 @@
         </div>
         <div class="form-group">
           <label for="employeePhone">Phone</label>
-          <input
-          type="text"
-          class="form-control"
-          id="employeePhone"
-          formControlName="phone" [ngClass]="{
+          <input type="text" class="form-control" id="employeePhone" formControlName="phone" [ngClass]="{
               'form-control-success': phone.valid && phone.dirty,
               'form-control-edit': editMode
-            }"
-            value="{{this.employeeForm.value.phone}}"
-            placeholder="+355683417790"
-            >
+            }" value="{{this.employeeForm.value.phone}}" placeholder="+355683417790">
           <div *ngIf="phone.invalid && (phone.dirty || phone.touched)" class="text-danger mt-2">
             <div *ngIf="phone.errors?.required">
               Phone is required.
@@ -117,15 +114,10 @@
         </div>
         <div class="form-group">
           <label for="employeeAge">Age</label>
-          <input
-          type="number"
-          class="form-control"
-          id="employeeAge"
-          formControlName="age" [ngClass]="{
+          <input type="number" class="form-control" id="employeeAge" formControlName="age" [ngClass]="{
               'form-control-success': age.valid && age.dirty,
               'form-control-edit': editMode
-            }"
-            value="{{this.employeeForm.value.age}}">
+            }" value="{{this.employeeForm.value.age}}">
           <div *ngIf="age.invalid && (age.dirty || age.touched)" class="text-danger mt-2">
             <div *ngIf="age.errors?.required">
               Age is required.
@@ -140,8 +132,7 @@
           <input type="date" class="form-control" id="employeeBirthday" formControlName="birthday" [ngClass]="{
               'form-control-success': birthday.valid && birthday.dirty,
               'form-control-edit': editMode
-            }" value="{{this.employeeForm.value.birthday}}"
-            >
+            }" value="{{this.employeeForm.value.birthday}}">
           <div *ngIf="birthday.invalid && (birthday.dirty || birthday.touched)" class="text-danger mt-2">
             <div *ngIf="birthday.errors?.required">
               Birthday is required.
@@ -170,26 +161,26 @@
         </div>
         <div class="form-group">
           <label for="employeePhoto">Photo</label>
-          <input
-          type="file"
-          class="form-control"
-          id="employeePhoto"
-          (change)="onPhotoUpload($event)"
-          [ngClass]="{
+          <input type="file" class="form-control" id="employeePhoto" (change)="onPhotoUpload($event)" [ngClass]="{
             'form-control-edit': editMode
           }">
-              <div *ngIf="photo.errors?.incorrect" class="text-danger mt-2">
-                File should be type jpg or png.
-              </div>
+          <div *ngIf="photo.errors?.incorrect" class="text-danger mt-2">
+            File should be type jpg or png.
+          </div>
         </div>
+
+        <div class="row justify-content-between px-4">
+          <image-cropper [imageChangedEvent]="imageChangedEvent" [maintainAspectRatio]="true" [aspectRatio]="4 / 3"
+            format="png" (imageCropped)="imageCropped($event)" (imageLoaded)="imageLoaded()"
+            (cropperReady)="cropperReady()" (loadImageFailed)="loadImageFailed()"></image-cropper>
+
+
+          <img *ngIf="croppedImage" title="Final image to be uploaded!"  class="finale-image d-inline-block" [src]="croppedImage" />
+        </div>
+
         <div class="form-group">
           <label for="employeeCV">CV</label>
-          <input
-          type="file"
-          class="form-control"
-          id="employeeCV"
-          (change)="onFileUpload($event)"
-          [ngClass]="{
+          <input type="file" class="form-control" id="employeeCV" (change)="onFileUpload($event)" [ngClass]="{
             'form-control-edit': editMode
           }">
           <div *ngIf="cv.errors?.incorrect" class="text-danger mt-2">
@@ -199,12 +190,8 @@
 
         <div class="form-group">
           <label for="positionDepartment">Witch Department?</label>
-          <select class="form-control"
-          formControlName="departmentId"
-          #departmentId
-          id="positionDepartment"
-          (change)="getJobPositionsOfDepartment()"
-          [ngClass]="{
+          <select class="form-control" formControlName="departmentId" #departmentId id="positionDepartment"
+            (change)="getJobPositionsOfDepartment()" [ngClass]="{
             'form-control-edit': editMode
           }">
             <option *ngFor="let department of departments" [ngValue]="department.id">
@@ -215,17 +202,10 @@
 
         <div class="form-group" *ngIf="employeeForm.value.departmentId">
           <label for="positionDepartment">Witch Job position?</label>
-          <select
-          class="form-control"
-          formControlName="positionId"
-          id="positionDepartment"
-          [ngClass]="{
+          <select class="form-control" formControlName="positionId" id="positionDepartment" [ngClass]="{
             'form-control-edit': editMode
           }">
-            <option
-            *ngFor="let jobPosition of jobPositions"
-
-            [ngValue]="jobPosition.id">
+            <option *ngFor="let jobPosition of jobPositions" [ngValue]="jobPosition.id">
               {{jobPosition.name}}
             </option>
           </select>

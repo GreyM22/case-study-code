@@ -3,6 +3,8 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
 import { Subscription } from 'rxjs';
+import { IsLoading, startLoading } from '../store/isLoading';
+import { Store } from '@ngrx/store';
 
 @Component({
   selector: 'app-header',
@@ -21,7 +23,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   constructor(
     private router: Router,
-    public authService: AuthService
+    public authService: AuthService,
+    private loadingStore: Store<IsLoading>
   ) {
 
   }
@@ -34,7 +37,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
       this.message = 'Pleas write something before searching!';
       return;
     }
-    this.router.navigate(['/search-employee', this.searchForm.value.searchParam]);
+    const searchParam = this.searchForm.value.searchParam;
+    // check if it has only white spaces
+    if (!searchParam.replace(/\s/g, '').length) { return; }
+    this.loadingStore.dispatch(startLoading());
+    this.router.navigate(['/employees/search-employee', searchParam]);
   }
 
   ngOnDestroy() {

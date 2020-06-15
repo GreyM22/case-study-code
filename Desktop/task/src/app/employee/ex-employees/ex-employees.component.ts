@@ -3,6 +3,9 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { EmployeeService } from '../employee.service';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { SearchResult } from '../search-result.model';
+import { Store } from '@ngrx/store';
+import { ErrorMessage, showError } from 'src/app/store/error';
+import { IsLoading, startLoading, stopLoading } from 'src/app/store/isLoading';
 
 @Component({
   selector: 'app-ex-employees',
@@ -11,8 +14,7 @@ import { SearchResult } from '../search-result.model';
 })
 export class ExEmployeesComponent implements OnInit {
   searchExEmployeeFrom: FormGroup;
-  exEmployeeList: SearchResult[];
-  errorFromServer: string;
+  exEmployeeList: SearchResult[] = [];
   totalNumberOfEmployees: number;
   pageNumber = 1;
   pageSize = 3;
@@ -20,10 +22,13 @@ export class ExEmployeesComponent implements OnInit {
   constructor(
     private employeeService: EmployeeService,
     private _router: Router,
-    private router: ActivatedRoute
+    private router: ActivatedRoute,
+    private errorStore: Store<ErrorMessage>,
+    private loadingStore: Store<IsLoading>
   ) { }
 
   ngOnInit() {
+    this.loadingStore.dispatch(startLoading());
     this.router.paramMap
       .subscribe((paramMap: ParamMap) => {
         if (
@@ -44,16 +49,17 @@ export class ExEmployeesComponent implements OnInit {
             .findFiredEmployee(searchTerm, this.pageNumber, this.pageSize)
             .subscribe(
               res => {
+                this.loadingStore.dispatch(stopLoading());
                 this.exEmployeeList = res.searchResult;
                 this.totalNumberOfEmployees = res.totalNumber;
                 console.log(res.message);
               },
               err => {
-                console.log(err.message);
-                this.errorFromServer = err.message;
+                this.errorStore.dispatch(showError({ payload: { message: err.error.message } }));
               }
             );
         } else {
+          this.loadingStore.dispatch(stopLoading());
           this.searchExEmployeeFrom = new FormGroup({
             searchTerm: new FormControl(null, Validators.required)
           });
@@ -66,7 +72,7 @@ export class ExEmployeesComponent implements OnInit {
       return;
     }
 
-    this._router.navigate(['ex-employees',
+    this._router.navigate(['employees/ex-employees',
       {
         searchTerm: this.searchExEmployeeFrom.value.searchTerm,
         pageNumber: this.pageNumber,
@@ -89,7 +95,7 @@ export class ExEmployeesComponent implements OnInit {
       this.pageNumber = page;
     }
     const searchTerm = this.searchExEmployeeFrom.value.searchTerm;
-    this._router.navigate(['ex-employees',
+    this._router.navigate(['employees/ex-employees',
       {
         searchTerm: searchTerm,
         pageNumber: this.pageNumber,

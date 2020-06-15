@@ -16,3 +16,20 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   display: inline-flex;
   vertical-align: middle;
 }
+
+.s003 {
+  min-height: 100vh;
+  display: -ms-flexbox;
+  display: flex;
+  font-family: 'Poppins', sans-serif;
+  background-color: #a598ee;
+  background-size: cover;
+  background-position: center center;
+  padding: 15px;
+  flex-direction: column;
+}
+
+.spinner-border{
+  width: 7rem;
+  height: 7rem;
+}

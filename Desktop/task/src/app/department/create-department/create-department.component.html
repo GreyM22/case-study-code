@@ -1,5 +1,5 @@
 <div class="_container">
-  <div class="card text-center mx-auto"
+  <div class="card text-center mx-auto " 
   [ngClass]="{
     'card-success': departmentForm?.valid && departmentForm.dirty,
     'card-edit': editMode
@@ -10,7 +10,11 @@
     }">
       Create Department
     </div>
-    <div *ngIf="messageFromServer && !editMode" class="card-header text-success">
+    <div *ngIf="messageFromServer" class="card-header"
+    [ngClass]="{
+      'text-danger': error,
+      'text-success': !error
+    }">
       {{messageFromServer}}
     </div>
     <div *ngIf="!messageFromServer && editMode" class="card-header text-edit card-header-edit">
