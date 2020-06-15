@@ -123,7 +123,7 @@ exports.getEmployees = (req, res, next) => {
           })
           .then(employees => {
             Employee.count({
-              where: { departmentId: id },
+              where: { departmentId: id, fired: 0 },
               distinct: true,
               col: 'Employee.id'
             })
@@ -239,131 +239,86 @@ exports.getEmployee = (req, res, next) => {
     })
 }
 
-exports.postEditEmployee = (req, res, next) => {
-  // retrieve the data of the employee from
-  // the request
-  const id = req.body.employeeID;
-  const updatedName = req.body.employeeName;
-  const updatedSurname = req.body.employeeSurname;
-  const updatedAddress = req.body.employeeAddress;
-  const updatedEmail = req.body.employeeEmail;
-  const updatedPhone = req.body.employeePhone;
-  const updatedAge = +req.body.employeeAge;
-  const updatedBirthday = new Date(req.body.employeeBirthday);
-  const updatedJobExperience = req.body.employeeJobExperience;
-  const updatedPersonalID = req.body.personalID;
-  const updatedDepartment = req.body.departmentId;
-  const updatedJobPosition = req.body.jobPosition;
-  const url = req.protocol + "://" + req.get("host");
-  // check if we have a file or a string for the photo
-  let updatedPhoto = req.body.photo;
-  let updatedCV = req.body.cv;
-  if (req.files.length) {
-    req.files.forEach(file => {
-      if (file.mimetype === 'application/pdf') {
-        updatedCV = url + "/uploads/" + file.filename;
-      } else {
-        updatedPhoto = url + "/uploads/" + file.filename;
-      }
-    })
-  }
-  // search the employee by his/her id
-  Employee
-    .findByPk(id)
-    .then(employee => {
-      if (!employee.fired) {
-        throw 'This employee was fired!'
-      }
-      // save all the data of the employee
-      employee.name = updatedName;
-      employee.surname = updatedSurname;
-      employee.address = updatedAddress;
-      employee.email = updatedEmail;
-      employee.phone = updatedPhone;
-      employee.age = +updatedAge;
-      employee.birthday = updatedBirthday;
-      employee.jobExperience = updatedJobExperience;
-      employee.photo = updatedPhoto;
-      employee.cv = updatedCV;
-      employee.personalID = updatedPersonalID;
-      EmployeePosition
-        .findAll({ where: { current: true, employeeId: id } })
-        .then(positions => {
-          if (!positions[0]) {
-            throw 'No current position was found for the employee!';
-          }
-          if (positions[0].positionId === +updatedJobPosition) {
-            return employee
-              .save()
-          }
-          employee.departmentId = +updatedDepartment;
-          employee
-            .save()
-            .catch(err => {
-              throw "Error in saving the new information!";
-            })
-          // change the current status to false
-          positions[0].current = false;
-          positions[0]
-            .save()
-            // in case it wasn't possible to save the changes
-            .catch(err => {
-              throw "Error in saving the new job position for the employee!";
-            })
-          EmployeePosition.create({
-            current: true,
-            positionId: +updatedJobPosition,
-            employeeId: +id
-          })
-            .then(result => {
-              return result;
-            })
-            .catch(err => {
-              throw "Error in adding the new position!"
-            })
-          // get the new job position
-          // the employee is assigned to
-          // Position
-          //   .findByPk(updatedJobPosition)
-          //   // if the job position was found
-          //   .then(position => {
-          //     console.log('before creating the new position!');
-          //     employee
-          //       .createPosition(position, { through: { current: true } })
-          //       // send message of success to the front-end
-          //       .then(result => {
-          //         return result;
-          //       })
-          //       // if the position couldn't be added
-          //       .catch(err => {
-          //         throw "The server couldn't add the job position to the employee"
-          //       })
-          //   })
-          //   // in case the job position wasn't found
-          //   .catch(err => {
-          //     throw 'The job position assigned to the employee,' +
-          //     ' was not found in the database,  but the employee was created!';
-          //   })
-        })
-        // in case wasn't possible to get the employee's position
-        .catch(err => {
-          throw "Error in changing the employee's data!";
-        })
-    })
-    // if everything worked well
-    .then(result => {
-      console.log(result);
-      res.status(200).json({
+exports.postEditEmployee = async (req, res, next) => {
+  try {
+    // retrieve the data of the employee from
+    // the request
+    const id = +req.body.employeeID;
+    const updatedName = req.body.employeeName;
+    const updatedSurname = req.body.employeeSurname;
+    const updatedAddress = req.body.employeeAddress;
+    const updatedEmail = req.body.employeeEmail;
+    const updatedPhone = req.body.employeePhone;
+    const updatedAge = +req.body.employeeAge;
+    const updatedBirthday = new Date(req.body.employeeBirthday);
+    const updatedJobExperience = req.body.employeeJobExperience;
+    const updatedPersonalID = req.body.personalID;
+    const updatedDepartment = +req.body.departmentId;
+    const updatedJobPosition = +req.body.jobPosition;
+    const url = req.protocol + "://" + req.get("host");
+    // check if we have a file or a string for the photo
+    let updatedPhoto = req.body.photo;
+    let updatedCV = req.body.cv;
+    if (req.files.length) {
+      req.files.forEach(file => {
+        if (file.mimetype === 'application/pdf') {
+          updatedCV = url + "/uploads/" + file.filename;
+        } else {
+          updatedPhoto = url + "/uploads/" + file.filename;
+        }
+      })
+    }
+    // search the employee by his/her id
+    const employee = await Employee.findByPk(id)
+    if (employee.fired) {
+      throw 'This employee was fired!'
+    }
+    // save all the data of the employee
+    employee.name = updatedName;
+    employee.surname = updatedSurname;
+    employee.address = updatedAddress;
+    employee.email = updatedEmail;
+    employee.phone = updatedPhone;
+    employee.age = +updatedAge;
+    employee.birthday = updatedBirthday;
+    employee.jobExperience = updatedJobExperience;
+    employee.photo = updatedPhoto;
+    employee.cv = updatedCV;
+    employee.personalID = updatedPersonalID;
+
+    const positions = await EmployeePosition.findAll({ where: { current: true, employeeId: id } });
+    if (!positions[0]) {
+      throw 'No current position was found for the employee!';
+    }
+    if (positions[0].positionId === +updatedJobPosition) {
+      await employee.save();
+      return res.status(200).json({
         message: "The employee was updated successfully"
       })
+
+    }
+    employee.departmentId = +updatedDepartment;
+    const savedEmployee = await employee.save()
+    // change the current status to false
+    positions[0].current = false;
+    const result = await positions[0].save();
+    if (!result) {
+      throw "Error in saving the new job position for the employee!";
+    }
+    // create new position for employee
+    const employeePosition = await EmployeePosition.create({
+      current: true,
+      positionId: +updatedJobPosition,
+      employeeId: +id
+    });
+    res.status(200).json({
+      message: "The employee was updated successfully"
     })
-    // if the employee wasn't found
-    .catch(err => {
-      console.log(err);
-      res.status(500).json({
-        message: "No employee was found in the server!"
-      })
+  } catch (err) {
+    res.status(500).json({
+      message: err
     })
+  }
 }
 
 exports.getEmployeeJobHistory = (req, res, next) => {
@@ -463,7 +418,7 @@ exports.searchEmployee = (req, res, next) => {
   const offset = (+req.query.pageNumber - 1) * limit;
   // get the search term
   const parameter = req.params.searchTerm;
-  const parameters = parameter.split(' ');
+  let parameters = parameter.split(' ');
   // search in employee
   let query = "SELECT positions.name as 'positionName' , employees.photo, " +
     " employees.name, employees.surname, employees.id \n" +
@@ -481,7 +436,10 @@ exports.searchEmployee = (req, res, next) => {
     " inner join `case-study`.employees \n" +
     " on employeepositions.employeeId=employees.id \n" +
     " where ";
+  parameters = parameters.filter(parameter => parameter !== '')
   parameters.forEach((parameter, index, data) => {
+    // check if there is a white space
+    console.log(query);
     query = query + " positions.name like '%" + parameter + "%' or employees.name like'%" + parameter +
       "%' or employees.surname like '%" + parameter + "%' ";
     countQuery = countQuery + " positions.name like '%" + parameter +
@@ -497,6 +455,7 @@ exports.searchEmployee = (req, res, next) => {
       countQuery += ');';
     } else {
       query += ' or ';
+      countQuery += ' or '
     }
   })
   sequelize.query(query)
@@ -552,6 +511,7 @@ exports.searchFiredEmployees = (req, res, next) => {
     " on departments.id=employees.departmentId \n" +
     " where (";
   if (parameter) {
+    parameters = parameters.filter( thisParameter => thisParameter !== '')
     parameters.forEach((parameter, index, data) => {
       query = query + " positions.name like '%" + parameter +
         "%' or employees.name like'%" + parameter +

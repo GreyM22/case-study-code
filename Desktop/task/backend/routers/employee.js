@@ -16,7 +16,7 @@ router.get('/search/:searchTerm', employeeControllers.searchEmployee);
 // /employees/edit/ => GET
 router.get('/edit/:employeeID', employeeControllers.getEmployee);
 // /employees => POST
-router.post('/edit', checkAuth, checkAuthorizedForEmployee, extractFile, employeeControllers.postEditEmployee);
+router.post('/edit', extractFile, employeeControllers.postEditEmployee);
 // /employees => GET
 router.get('/jobPosition/:employeeID', employeeControllers.getEmployeeJobPosition);
 // /employees => GET

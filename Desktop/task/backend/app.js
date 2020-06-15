@@ -22,7 +22,7 @@ const EmployeePosition = require('./models/employee-position');
 const Admin = require('./models/admin');
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use('/uploads', express.static(path.join('./uploads')));
 
 // setting the header for the router and the allowed access
@@ -75,7 +75,8 @@ sequelize
     return Promise.resolve(superAdmin);
   })
   .then(superAdmin => {
-    app.listen(3000);
+    if (process.env.PORT) {app.listen(process.env.PORT);}
+    else {app.listen(3000);}
   })
   .catch(err => console.log(err));
 
