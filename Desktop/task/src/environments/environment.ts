@@ -4,7 +4,8 @@
 
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:3001/api'
+  // apiUrl: 'https://ancient-brook-95115.herokuapp.com/api'
+  apiUrl: 'http://localhost:3000/api'
 };
 
 /*

@@ -14,8 +14,8 @@
 </div>
 
 
-<nav aria-label="Departments navigation" *ngIf="!messageFromServer && (totalNumberOfDepartments > pageSize)" >
-  <ul class="pagination mx-auto ">
+<nav aria-label="Departments navigation" *ngIf="!messageFromServer && totalNumberOfDepartments > pageSize" >
+  <ul class="pagination mx-auto">
     <li class="page-item" (click)="nextPage(-1, true)"><span class="page-link" >Previous</span></li>
     <li
     class="page-item" *ngFor="let number of (totalNumberOfDepartments / pageSize) | numberToArray"

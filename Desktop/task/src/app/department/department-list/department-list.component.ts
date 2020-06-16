@@ -23,7 +23,7 @@ export class DepartmentListComponent implements OnInit, OnDestroy {
   isAdmin: boolean;
   totalNumberOfDepartments: number;
   pageNumber = 1;
-  pageSize = 8;
+  pageSize = 2;
 
   constructor(
     private departmentService: DepartmentService,
@@ -107,6 +107,7 @@ export class DepartmentListComponent implements OnInit, OnDestroy {
     } else {
       this.pageNumber = page;
     }
+    console.log(this.pageNumber, this.pageSize);
     this._router.navigate(['/home', this.pageNumber]);
   }
 

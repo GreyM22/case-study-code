@@ -70,7 +70,10 @@ export class AuthService {
     return !!this.getToken();
   }
 
-  isAuthorized(departmentId: number) {
+  isAuthorized(departmentId: number | string) {
+    if (typeof departmentId === 'string') {
+      return +departmentId === +localStorage.getItem(localStorageDepartmentIdName);
+    }
     return departmentId === +localStorage.getItem(localStorageDepartmentIdName);
   }
 

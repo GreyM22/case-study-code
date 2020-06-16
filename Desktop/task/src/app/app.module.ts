@@ -1,9 +1,9 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { NgModule, InjectionToken } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS} from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
-import { StoreModule } from '@ngrx/store';
+import { StoreModule, ActionReducerMap } from '@ngrx/store';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { NoopAnimationsModule, BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
@@ -28,7 +28,6 @@ import { HeaderComponent } from './header/header.component';
 import { NgbdModalContentComponent } from './modal/ngbd-modal-content/ngbd-modal-content.component';
 import { ConfirmationModalComponent } from './modal/confirmation-modal/confirmation-modal.component';
 import { DepartmentListComponent } from './department/department-list/department-list.component';
-
 @NgModule({
   declarations: [
     AppComponent,
@@ -49,9 +48,9 @@ import { DepartmentListComponent } from './department/department-list/department
     NgbModule,
     UtilModule,
     StoreModule.forRoot({
-      [authFeatureKey]: authReducer,
-      [errorFeatureKey]: errorReducer,
-      [loadingFeatureKey]: loadReducer
+      user: authReducer,
+      error: errorReducer,
+      loading: loadReducer
     }),
     StoreDevtoolsModule.instrument({})
   ],

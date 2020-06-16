@@ -33,6 +33,7 @@ export class DepartmentService {
   }
 
   getAll(pageNumber: number, pageSize: number): Observable<any> {
+    console.log(BACKEND_URL + '?pageNumber=' + pageNumber + '&pageSize=' + pageSize);
     return this.http.get<{message: string, departments: Department[], totalNumber: number}>
     (BACKEND_URL + '?pageNumber=' + pageNumber + '&pageSize=' + pageSize);
   }
