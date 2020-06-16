@@ -1,0 +1,24 @@
+.bd-navbar{
+  background-color: #7952b3;
+}
+
+.bd-navbar .navbar-nav .nav-link{
+  color: rgba(255,255,255,.85)!important;
+}
+
+.bd-navbar .navbar-nav .nav-link.active, .bd-navbar .navbar-nav .nav-link:hover{
+  color: white!important;
+}
+
+
+.navbar-dark .navbar-toggler:focus{
+  outline: #ffe484;
+  box-shadow: 0px 1px 10px #ffe484;
+}
+
+
+@media only screen and (max-width: 1025px) {
+  .navbar-nav .nav-item {
+    text-align: center;
+  }
+}

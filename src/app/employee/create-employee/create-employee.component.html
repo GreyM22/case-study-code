@@ -1,0 +1,230 @@
+<div class="_container">
+  <div class="card text-center mx-auto" [ngClass]="{
+    'card-success': employeeForm.valid && employeeForm.dirty,
+    'card-edit': editMode
+  }" #TopCard>
+    <div *ngIf="!messageFromServer && !editMode" class="card-header" [ngClass]="{
+        'card-header-success': employeeForm.valid && employeeForm.dirty
+    }">
+      Create Employee
+    </div>
+    <div *ngIf="messageFromServer" class="card-header" [ngClass]="{
+      'text-danger': error,
+      'text-success': !error
+    }">
+      {{messageFromServer}}
+    </div>
+    <div *ngIf="!messageFromServer && editMode" class="card-header text-edit card-header-edit">
+      Edit Employee
+    </div>
+
+    <div class="card-body">
+      <h5 class="card-title">Insert the information for the employee!</h5>
+      <form [formGroup]="employeeForm" #htmlForm="ngForm">
+        <div class="form-group">
+          <label for="employeeName">Name</label>
+          <input specialIsAlphaNumericWithSpace type="text" class="form-control" id="employeeName" formControlName="name"
+            [ngClass]="{
+              'form-control-success': name.valid && name.dirty,
+              'form-control-edit': editMode
+            }" value="{{this.employeeForm.value.name}}">
+          <div *ngIf="name.invalid && (name.dirty || name.touched)" class="text-danger mt-2">
+            <div *ngIf="name.errors?.required">
+              Name is required.
+            </div>
+            <div *ngIf="name.errors?.minlength">
+              Name must be at least 4 characters long.
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="employeeSurname">Surname</label>
+          <input specialIsAlphaNumericWithSpace type="text" class="form-control" id="employeeSurname" formControlName="surname"
+            [ngClass]="{
+              'form-control-success': surname.valid && surname.dirty,
+              'form-control-edit': editMode
+            }" value="{{this.employeeForm.value.surname}}">
+          <div *ngIf="surname.invalid && (surname.dirty || surname.touched)" class="text-danger mt-2">
+            <div *ngIf="surname.errors?.required">
+              Surname is required.
+            </div>
+            <div *ngIf="surname.errors?.minlength">
+              Surname must be at least 4 characters long.
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="employeeAddress">Address</label>
+          <input specialIsAlphaNumericWithSpace type="text" class="form-control" id="employeeAddress"
+            formControlName="address" [ngClass]="{
+              'form-control-success': address.valid && address.dirty,
+              'form-control-edit': editMode
+            }" value="{{this.employeeForm.value.address}}">
+          <div *ngIf="address.invalid && (address.dirty || address.touched)" class="text-danger mt-2">
+            <div *ngIf="address.errors?.required">
+              Address is required.
+            </div>
+            <div *ngIf="address.errors?.minlength">
+              Address must be at least 4 characters long.
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="employeePersonalID">Personal ID</label>
+          <input specialIsAlphaNumeric type="text" class="form-control" id="employeePersonalID"
+            formControlName="personalID" [ngClass]="{
+              'form-control-success': personalID.valid && personalID.dirty,
+              'form-control-edit': editMode
+            }" value="{{this.employeeForm.value.personalID}}">
+          <div *ngIf="personalID.invalid && (personalID.dirty || personalID.touched)" class="text-danger mt-2">
+            <div *ngIf="personalID.errors?.required">
+              Personal ID is required.
+            </div>
+            <div *ngIf="personalID.errors?.minlength">
+              Personal ID must be at least 4 characters long.
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="employeeEmail">Email</label>
+          <input type="email" class="form-control" id="employeeEmail" formControlName="email" [ngClass]="{
+              'form-control-success': email.valid && email.dirty,
+              'form-control-edit': editMode
+            }" value="{{this.employeeForm.value.email}}">
+          <div *ngIf="email.invalid && (email.dirty || email.touched)" class="text-danger mt-2">
+            <div *ngIf="email.errors?.required">
+              Email is required.
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="employeePhone">Phone</label>
+          <input type="text" class="form-control" id="employeePhone" formControlName="phone" [ngClass]="{
+              'form-control-success': phone.valid && phone.dirty,
+              'form-control-edit': editMode
+            }" value="{{this.employeeForm.value.phone}}" placeholder="+355683417790">
+          <div *ngIf="phone.invalid && (phone.dirty || phone.touched)" class="text-danger mt-2">
+            <div *ngIf="phone.errors?.required">
+              Phone is required.
+            </div>
+            <div *ngIf="phone.errors?.minlength">
+              Phone must be at least 4 characters long.
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="employeeAge">Age</label>
+          <input type="number" class="form-control" id="employeeAge" formControlName="age" [ngClass]="{
+              'form-control-success': age.valid && age.dirty,
+              'form-control-edit': editMode
+            }" value="{{this.employeeForm.value.age}}">
+          <div *ngIf="age.invalid && (age.dirty || age.touched)" class="text-danger mt-2">
+            <div *ngIf="age.errors?.required">
+              Age is required.
+            </div>
+            <div *ngIf="age.errors?.min">
+              Age must be 18+.
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="employeeBirthday">Birthday</label>
+          <input type="date" class="form-control" id="employeeBirthday" formControlName="birthday" [ngClass]="{
+              'form-control-success': birthday.valid && birthday.dirty,
+              'form-control-edit': editMode
+            }" value="{{this.employeeForm.value.birthday}}">
+          <div *ngIf="birthday.invalid && (birthday.dirty || birthday.touched)" class="text-danger mt-2">
+            <div *ngIf="birthday.errors?.required">
+              Birthday is required.
+            </div>
+            <div *ngIf="birthday.errors?.dates">
+              {{birthday.errors?.dates }}
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="employeeJobExperience">Job Experience</label>
+          <textarea formControlName="jobExperience" class="form-control" id="employeeJobExperience" [ngClass]="{
+              'form-control-success': jobExperience.valid && jobExperience.dirty,
+              'form-control-edit': editMode
+            }" value="{{this.employeeForm.value.jobExperience}}">
+            {{this.employeeForm.value.jobExperience}}
+          </textarea>
+          <div *ngIf="jobExperience.invalid && (jobExperience.dirty || jobExperience.touched)" class="text-danger mt-2">
+            <div *ngIf="jobExperience.errors?.required">
+              Job experience is required.
+            </div>
+            <div *ngIf="jobExperience.errors?.minlength">
+              Job experience must be at least 50 characters long.
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="employeePhoto">Photo</label>
+          <input type="file" class="form-control" id="employeePhoto" (change)="onPhotoUpload($event)" [ngClass]="{
+            'form-control-edit': editMode
+          }">
+          <div *ngIf="photo.errors?.incorrect" class="text-danger mt-2">
+            File should be type jpg or png.
+          </div>
+        </div>
+
+        <div class="row justify-content-between px-4">
+          <image-cropper [imageChangedEvent]="imageChangedEvent" [maintainAspectRatio]="true" [aspectRatio]="4 / 3"
+            format="png" (imageCropped)="imageCropped($event)" (imageLoaded)="imageLoaded()"
+            (cropperReady)="cropperReady()" (loadImageFailed)="loadImageFailed()"></image-cropper>
+
+
+          <img *ngIf="croppedImage" title="Final image to be uploaded!"  class="finale-image d-inline-block" [src]="croppedImage" />
+        </div>
+
+        <div class="form-group">
+          <label for="employeeCV">CV</label>
+          <input type="file" class="form-control" id="employeeCV" (change)="onFileUpload($event)" [ngClass]="{
+            'form-control-edit': editMode
+          }">
+          <div *ngIf="cv.errors?.incorrect" class="text-danger mt-2">
+            File should be of type pdf.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="positionDepartment">Witch Department?</label>
+          <select class="form-control" formControlName="departmentId" #departmentId id="positionDepartment"
+            (change)="getJobPositionsOfDepartment()" [ngClass]="{
+            'form-control-edit': editMode
+          }">
+            <option *ngFor="let department of departments" [ngValue]="department.id">
+              {{department.name}}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group" *ngIf="employeeForm.value.departmentId">
+          <label for="positionDepartment">Witch Job position?</label>
+          <select class="form-control" formControlName="positionId" id="positionDepartment" [ngClass]="{
+            'form-control-edit': editMode
+          }">
+            <option *ngFor="let jobPosition of jobPositions" [ngValue]="jobPosition.id">
+              {{jobPosition.name}}
+            </option>
+          </select>
+        </div>
+
+
+        <button type="button" (click)="onSubmit()" class="btn submit w-100" [ngClass]="{
+            'submit-success': employeeForm.valid && employeeForm.dirty,
+            'submit-edit': editMode
+          }">
+          Submit
+        </button>
+      </form>
+    </div>
+    <div class="card-footer text-muted" [ngClass]="{
+        'card-footer-success': employeeForm.valid && employeeForm.dirty,
+        'card-footer-edit': editMode
+      }">
+      Click on Submit to finish!
+    </div>
+  </div>
+</div>

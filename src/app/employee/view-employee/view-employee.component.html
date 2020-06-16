@@ -1,0 +1,56 @@
+<div class="card" *ngIf="!messageFromServer">
+  <a class="cv d-md-none d-sm-block" target="_blank" [href]="employee?.cv" title="Click to see CV!"><mat-icon >description</mat-icon></a>
+  <div class="row m-0 w-100">
+    <div class="img-wrapper">
+      <img class="ml-5 mt-3" [src]="employee?.photo" alt="Employee Profile Picture">
+    </div>
+    <h1 class="card-title mx-auto text-center mt-4">{{employee?.name}} {{employee?.surname}}</h1>
+    <a class="cv d-md-block d-none" target="_blank" [href]="employee?.cv" title="Click to see CV!"><mat-icon >description</mat-icon></a>
+  </div>
+  <div class="card-body ">
+    <div class="row">
+      <div class="col-lg-3 ml-4 text-lg-left text-lg-left text-center">
+        <h2>{{currentJobPosition[0]?.name}}</h2>
+        <h4 *ngIf="department">in
+          <a [routerLink]="['/departments/view-department', department.id]" title="Click to view department!">{{department?.name}}</a>
+
+        </h4>
+        <h6>Personal info:</h6>
+        <p class="subtitle mb-3">
+          Phone: <a href="tel:{{employee?.phone}}" title="Call!">{{employee?.phone}}</a><br>
+          Email: <a href="mailto:{{employee?.email}}" title="Send an email!">{{employee?.email}}</a><br>
+          Address: {{employee?.address}} <br>
+          Birthday: {{employee?.birthday}} <br>
+          Age: {{employee?.age}} <br>
+          ID: {{employee?.personalID}}
+        </p>
+      </div>
+      <div class="col-lg-auto text-lg-left text-center">
+        <h6>Previews Job Experience</h6>
+        <p class="card-text department-view">{{employee?.jobExperience}}</p>
+        <h6>Job history in the company:</h6>
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Job Position</th>
+              <th scope="col">Started At</th>
+              <th scope="col">Still works?</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let job of jobHistory">
+              <td>{{job.name}}</td>
+              <td>{{job.createdAt | date:'dd-mm-yyyy'}}</td>
+              <td *ngIf="job.current === 1">Still Working</td>
+              <td *ngIf="job.current === 0">Changed</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="alert alert-danger text-center m-5" role="alert" *ngIf="messageFromServer">
+  {{messageFromServer}}
+</div>

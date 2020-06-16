@@ -1,0 +1,39 @@
+<nav class="navbar navbar-expand-xl navbar-dark bd-navbar">
+  <a class="navbar-brand" href="#">Case-Study</a>
+  <button class="navbar-toggler  " type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item ">
+        <a class="nav-link"  routerLink="/home" routerLinkActive="active">Home <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" *ngIf="authService.isSuperAdmin()"  routerLink="/departments/create-department" routerLinkActive="active">Create Department</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" *ngIf="authService.isLoggedIn()"  routerLink="/departments/create-position" routerLinkActive="active">Create Job Position</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" *ngIf="authService.isSuperAdmin()"  routerLink="/auth/create-admin" routerLinkActive="active">Create Department Admin</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" *ngIf="authService.isLoggedIn()" routerLink="/employees/add-employee" routerLinkActive="active">Add Employee</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/employees/ex-employees" routerLinkActive="active">Ex Employees</a>
+      </li>
+      <li class="nav-item">
+        <a  class="nav-link" *ngIf="!authService.isLoggedIn()" routerLink="/auth/login" routerLinkActive="active">Login</a>
+      </li>
+      <li class="nav-item">
+        <a  (click)="authService.logout()" *ngIf="authService.isLoggedIn()" class="nav-link" routerLink="/auth/login" routerLinkActive="active">Logout</a>
+      </li>
+    </ul>
+    <form [formGroup]="searchForm" class="form-inline my-2 my-lg-0 justify-content-center">
+      <input formControlName="searchParam" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+      <button (click)="searchEmployee()" class="btn btn-outline-warning my-2 my-sm-0" type="submit">Find Employee</button>
+    </form>
+  </div>
+</nav>

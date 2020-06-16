@@ -1,0 +1,11 @@
+
+.loading {
+  position: absolute;
+  z-index: 100;
+  top: 0;
+  width: 100%;
+  height: calc(100vh - 56px);
+  display: flex;
+  background-color: #a598ee;
+  padding-top: 102px;
+}

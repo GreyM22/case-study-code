@@ -1,0 +1,35 @@
+/* You can add global styles to this file, and also import other style files */
+::-moz-selection { /* Code for Firefox */
+  color: white!important;
+  background: #7952b3!important;
+}
+
+::selection {
+  color: white!important;
+  background: #7952b3!important;
+}
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.material-icons {
+  display: inline-flex;
+  vertical-align: middle;
+}
+
+.s003 {
+  min-height: 100vh;
+  display: -ms-flexbox;
+  display: flex;
+  font-family: 'Poppins', sans-serif;
+  background-color: #a598ee;
+  background-size: cover;
+  background-position: center center;
+  padding: 15px;
+  flex-direction: column;
+}
+
+.spinner-border{
+  width: 7rem;
+  height: 7rem;
+}

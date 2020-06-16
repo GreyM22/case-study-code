@@ -1,0 +1,87 @@
+<div class="_container">
+  <div class="card text-center mx-auto"
+  [ngClass]="{
+    'card-success': positionForm?.valid && positionForm.dirty,
+    'card-edit': editMode
+  }">
+    <div *ngIf="!messageFromServer && !editMode" class="card-header"
+      [ngClass]="{
+        'card-header-success': positionForm.valid && positionForm.dirty
+    }">
+      Create Job Position
+    </div>
+    <div *ngIf="messageFromServer" class="card-header"
+    [ngClass]="{
+      'text-success': !error,
+      'text-danger': error
+    }">
+      {{messageFromServer}}
+    </div>
+    <div *ngIf="!messageFromServer && editMode" class="card-header text-edit card-header-edit">
+      Edit Job Position
+    </div>
+
+    <div class="card-body">
+      <h5 class="card-title">Insert the information for the new Job Position!</h5>
+      <form (submit)="onSubmit()" [formGroup]="positionForm">
+        <div class="form-group">
+          <label for="positionName">Job Position Name</label>
+          <input specialIsAlphaNumericWithSpace type="text" class="form-control" id="positionName" formControlName="name"
+            [ngClass]="{
+              'form-control-success': name.valid && name.dirty,
+              'form-control-edit': editMode
+            }" value="{{this.positionForm.value.name}}">
+          <div *ngIf="name.invalid && (name.dirty || name.touched)" class="text-danger mt-2">
+            <div *ngIf="name.errors.required">
+              Job Position Name is required.
+            </div>
+            <div *ngIf="name.errors.minlength">
+              Job Position Name must be at least 4 characters long.
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="positionDescription">Description</label>
+          <textarea formControlName="description" class="form-control" id="positionDescription"
+            [ngClass]="{
+              'form-control-success': description.valid && description.dirty,
+              'form-control-edit': editMode
+            }"
+            value="{{this.positionForm.value.description}}">
+            {{this.positionForm.value.description}}
+          </textarea>
+          <div *ngIf="description.invalid && (description.dirty || description.touched)" class="text-danger mt-2">
+            <div *ngIf="description.errors.required">
+              Description is required.
+            </div>
+            <div *ngIf="description.errors.minlength">
+              Description must be at least 50 characters long.
+            </div>
+          </div>
+        </div>
+        <div class="form-group" *ngIf="!editMode">
+          <label for="positionDepartment">Witch Department?</label>
+          <select class="form-control" formControlName="departmentId" id="positionDepartment">
+            <option *ngFor="let department of departments" [ngValue]="department.id">
+              {{department.name}}
+            </option>
+          </select>
+        </div>
+        <button type="submit" class="btn submit w-100"
+          [ngClass]="{
+            'submit-success': positionForm.valid && positionForm.dirty,
+            'submit-edit': editMode
+          }">
+          Submit
+        </button>
+      </form>
+    </div>
+    <div class="card-footer text-muted"
+      [ngClass]="{
+        'card-footer-success': positionForm.valid && positionForm.dirty,
+        'card-footer-edit': editMode
+      }">
+      Click on Submit to finish!
+    </div>
+  </div>
+</div>

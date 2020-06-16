@@ -1,0 +1,79 @@
+<div class="_container">
+  <div class="card text-center mx-auto " 
+  [ngClass]="{
+    'card-success': departmentForm?.valid && departmentForm.dirty,
+    'card-edit': editMode
+  }">
+    <div *ngIf="!messageFromServer && !editMode" class="card-header"
+      [ngClass]="{
+        'card-header-success': departmentForm.valid && departmentForm.dirty
+    }">
+      Create Department
+    </div>
+    <div *ngIf="messageFromServer" class="card-header"
+    [ngClass]="{
+      'text-danger': error,
+      'text-success': !error
+    }">
+      {{messageFromServer}}
+    </div>
+    <div *ngIf="!messageFromServer && editMode" class="card-header text-edit card-header-edit">
+      Edit Department
+    </div>
+
+    <div class="card-body">
+      <h5 class="card-title">Insert the information for the department!</h5>
+      <form (submit)="onSubmit()" [formGroup]="departmentForm">
+        <div class="form-group">
+          <label for="departmentName">Department Name</label>
+          <input specialIsAlphaNumericWithSpace type="text" class="form-control" id="departmentName" formControlName="name"
+            [ngClass]="{
+              'form-control-success': name.valid && name.dirty,
+              'form-control-edit': editMode
+            }" value="{{this.departmentForm.value.name}}">
+          <div *ngIf="name.invalid && (name.dirty || name.touched)" class="text-danger mt-2">
+            <div *ngIf="name.errors.required">
+              Name is required.
+            </div>
+            <div *ngIf="name.errors.minlength">
+              Name must be at least 4 characters long.
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="departmentDescription">Description</label>
+          <textarea formControlName="description" class="form-control" id="departmentDescription"
+            [ngClass]="{
+              'form-control-success': description.valid && description.dirty,
+              'form-control-edit': editMode
+            }"
+            value="{{this.departmentForm.value.description}}">
+            {{this.departmentForm.value.description}}
+          </textarea>
+          <div *ngIf="description.invalid && (description.dirty || description.touched)" class="text-danger mt-2">
+            <div *ngIf="description.errors.required">
+              Description is required.
+            </div>
+            <div *ngIf="description.errors.minlength">
+              Description must be at least 50 characters long.
+            </div>
+          </div>
+        </div>
+        <button type="submit" class="btn submit w-100"
+          [ngClass]="{
+            'submit-success': departmentForm.valid && departmentForm.dirty,
+            'submit-edit': editMode
+          }">
+          Submit
+        </button>
+      </form>
+    </div>
+    <div class="card-footer text-muted"
+      [ngClass]="{
+        'card-footer-success': departmentForm.valid && departmentForm.dirty,
+        'card-footer-edit': editMode
+      }">
+      Click on Submit to finish!
+    </div>
+  </div>
+</div>
